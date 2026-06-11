@@ -130,6 +130,7 @@ function count(storeName) {
 async function saveNote(note) {
   note.updatedAt = Date.now();
   await put('notes', note);
+  performSync();
   return note;
 }
 
@@ -194,6 +195,7 @@ async function updateNote(id, fields) {
   Object.assign(note, fields);
   note.updatedAt = Date.now();
   await put('notes', note);
+  performSync();
   return note;
 }
 
@@ -203,6 +205,7 @@ async function updateNote(id, fields) {
 
 async function saveReviewLog(entry) {
   await put('review_log', entry);
+  performSync();
   return entry;
 }
 
@@ -404,6 +407,8 @@ function normalizeNoteForPush(note) {
     ai_etymology: note.aiEtymology || null,
     ai_related_expressions: JSON.stringify(note.aiRelatedExpressions || []),
     ai_categorized_at: note.aiCategorizedAt || null,
+    is_mastered: note.isMastered ? 1 : 0,
+    consecutive_correct: note.consecutiveCorrect || 0,
     created_at: note.createdAt,
     updated_at: note.updatedAt,
     deleted: note._deleted ? 1 : 0,
@@ -439,6 +444,8 @@ function denormalizeNoteFromServer(rn) {
     aiEtymology: rn.ai_etymology || null,
     aiRelatedExpressions: aiRelated,
     aiCategorizedAt: rn.ai_categorized_at || null,
+    isMastered: rn.is_mastered === 1,
+    consecutiveCorrect: rn.consecutive_correct || 0,
     createdAt: rn.created_at,
     updatedAt: rn.updated_at || rn.synced_at || Date.now(),
     _deleted: rn.deleted === 1,

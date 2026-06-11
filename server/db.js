@@ -89,6 +89,8 @@ async function init() {
       ai_etymology        TEXT,
       ai_related_expressions TEXT,
       ai_categorized_at   INTEGER,
+      is_mastered         INTEGER DEFAULT 0,
+      consecutive_correct INTEGER DEFAULT 0,
       created_at          INTEGER NOT NULL,
       updated_at          INTEGER NOT NULL,
       deleted             INTEGER DEFAULT 0,
@@ -114,6 +116,10 @@ async function init() {
     CREATE INDEX IF NOT EXISTS idx_devices_code ON devices(pairing_code);
     CREATE INDEX IF NOT EXISTS idx_devices_group ON devices(pairing_group_id);
   `);
+
+  // Migrate: add columns that may not exist in older databases
+  try { _db.exec('ALTER TABLE notes ADD COLUMN is_mastered INTEGER DEFAULT 0'); } catch (_) {}
+  try { _db.exec('ALTER TABLE notes ADD COLUMN consecutive_correct INTEGER DEFAULT 0'); } catch (_) {}
 
   console.log('  Database ready:', DB_PATH);
 }
@@ -214,6 +220,8 @@ async function pushChanges(deviceId, payload) {
       ai_etymology: n.ai_etymology || null,
       ai_related_expressions: n.ai_related_expressions || '[]',
       ai_categorized_at: n.ai_categorized_at || null,
+      is_mastered: n.is_mastered || 0,
+      consecutive_correct: n.consecutive_correct || 0,
       created_at: n.created_at || now,
       updated_at: n.updated_at || now,
       deleted: n.deleted || 0,
@@ -238,12 +246,14 @@ async function pushChanges(deviceId, payload) {
       ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at,
       ai_expanded, ai_expanded_at, ai_chinese_translation, ai_definition, ai_definition_en,
       ai_examples, ai_etymology, ai_related_expressions, ai_categorized_at,
+      is_mastered, consecutive_correct,
       created_at, updated_at, deleted, device_id, synced_at
     ) VALUES (
       @id, @content, @user_memo, @category, @favorited,
       @ease_factor, @interval_days, @repetitions, @next_review_at, @last_reviewed_at,
       @ai_expanded, @ai_expanded_at, @ai_chinese_translation, @ai_definition, @ai_definition_en,
       @ai_examples, @ai_etymology, @ai_related_expressions, @ai_categorized_at,
+      @is_mastered, @consecutive_correct,
       @created_at, @updated_at, @deleted, @device_id, @synced_at
     ) ON CONFLICT(id) DO UPDATE SET
       content = COALESCE(excluded.content, notes.content),
@@ -264,6 +274,8 @@ async function pushChanges(deviceId, payload) {
       ai_etymology = COALESCE(excluded.ai_etymology, notes.ai_etymology),
       ai_related_expressions = COALESCE(excluded.ai_related_expressions, notes.ai_related_expressions),
       ai_categorized_at = COALESCE(excluded.ai_categorized_at, notes.ai_categorized_at),
+      is_mastered = excluded.is_mastered,
+      consecutive_correct = excluded.consecutive_correct,
       updated_at = excluded.updated_at,
       deleted = excluded.deleted,
       device_id = excluded.device_id,

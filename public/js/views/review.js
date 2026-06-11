@@ -46,26 +46,17 @@ async function showPreStart() {
     return;
   }
 
-  content.innerHTML = `
-    <div class="review-prestart">
-      <div class="review-prestart__count">${dueNotes.length}</div>
-      <div class="review-prestart__label">card${dueNotes.length !== 1 ? 's' : ''} due today</div>
-      <button class="btn btn--primary btn--lg" id="startReviewBtn">Start Review</button>
-    </div>
-  `;
-
-  document.getElementById('startReviewBtn').addEventListener('click', () => {
-    reviewSession = {
-      notes: dueNotes,
-      currentIndex: 0,
-      revealed: false,
-      total: dueNotes.length,
-      remembered: 0,
-      forgotten: 0,
-      mastered: 0,
-    };
-    renderReviewCard();
-  });
+  // Jump straight into the review session
+  reviewSession = {
+    notes: dueNotes,
+    currentIndex: 0,
+    revealed: false,
+    total: dueNotes.length,
+    remembered: 0,
+    forgotten: 0,
+    mastered: 0,
+  };
+  renderReviewCard();
 }
 
 /**

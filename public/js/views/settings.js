@@ -611,11 +611,11 @@ function renderThemePicker() {
 // Style Picker (Interface texture/depth)
 // ---------------------------------------------------------------------------
 const STYLES = [
+  { id: 'original', name: 'Original', hint: 'Clean modern with grid pattern' },
+  { id: 'editorial', name: 'Editorial', hint: 'Linen paper & print typography' },
   { id: 'soft-depth', name: 'Soft Depth', hint: 'Neumorphic shadows & noise texture' },
   { id: 'tag', name: 'Tag Aesthetic', hint: 'Cork board & physical tag cards' },
-  { id: 'editorial', name: 'Editorial', hint: 'Linen paper & print typography' },
   { id: 'glass', name: 'Frosted Glass', hint: 'Acrylic blur & translucent surfaces' },
-  { id: 'original', name: 'Original', hint: 'Clean modern with grid pattern' },
 ];
 
 function getCurrentStyle() {
