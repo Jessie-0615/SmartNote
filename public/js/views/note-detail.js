@@ -41,11 +41,20 @@ async function renderNoteDetail(noteId) {
   // Build expansion HTML
   let expansionHtml = '';
   if (note.aiExpanded) {
+    // Highlight the original note text within an example sentence
+    const highlightNote = (text) => {
+      const escaped = escapeHtml(text);
+      const noteText = escapeHtml(note.content);
+      // Case-insensitive match, preserve original casing from example
+      const regex = new RegExp(`(${noteText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return escaped.replace(regex, '<span style="font-weight:700;color:var(--primary)">$1</span>');
+    };
+
     // Helper: render example items (supports both string and {en, zh} formats)
     const renderExample = (ex) => {
-      if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm)">${escapeHtml(ex)}</li>`;
+      if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm)">${highlightNote(ex)}</li>`;
       return `<li style="margin-bottom:var(--space-sm)">
-        <div style="font-weight:700;color:var(--primary)">${escapeHtml(ex.en)}</div>
+        <div>${highlightNote(ex.en)}</div>
         ${ex.zh ? `<div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:2px">${escapeHtml(ex.zh)}</div>` : ''}
       </li>`;
     };
@@ -71,21 +80,21 @@ async function renderNoteDetail(noteId) {
 
         ${note.aiDefinition ? `
           <div class="expand-section">
-            <div class="expand-section__header"><span class="expand-arrow">▸</span> 中文释义 · Definition (CN)</div>
+            <div class="expand-section__header">中文释义 · Definition (CN) <span class="expand-arrow">▸</span></div>
             <div class="expand-section__body"><p style="font-size:var(--font-size-md);line-height:1.8">${escapeHtml(note.aiDefinition)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiDefinitionEn ? `
           <div class="expand-section open">
-            <div class="expand-section__header"><span class="expand-arrow">▾</span> English Definition</div>
+            <div class="expand-section__header">English Definition <span class="expand-arrow">▾</span></div>
             <div class="expand-section__body"><p style="color:var(--text-secondary)">${escapeHtml(note.aiDefinitionEn)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiExamples && note.aiExamples.length ? `
           <div class="expand-section open">
-            <div class="expand-section__header"><span class="expand-arrow">▾</span> 例句 · Example Sentences</div>
+            <div class="expand-section__header">例句 · Example Sentences <span class="expand-arrow">▾</span></div>
             <div class="expand-section__body">
               <ul style="list-style:none;padding-left:0">
                 ${note.aiExamples.map(renderExample).join('')}
@@ -96,14 +105,14 @@ async function renderNoteDetail(noteId) {
 
         ${note.aiEtymology ? `
           <div class="expand-section">
-            <div class="expand-section__header"><span class="expand-arrow">▸</span> 词源 · Etymology</div>
+            <div class="expand-section__header">词源 · Etymology <span class="expand-arrow">▸</span></div>
             <div class="expand-section__body"><p>${escapeHtml(note.aiEtymology)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiRelatedExpressions && note.aiRelatedExpressions.length ? `
           <div class="expand-section open">
-            <div class="expand-section__header"><span class="expand-arrow">▾</span> 相关表达 · Related Expressions</div>
+            <div class="expand-section__header">相关表达 · Related Expressions <span class="expand-arrow">▾</span></div>
             <div class="expand-section__body">
               <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm)">
                 ${note.aiRelatedExpressions.map(renderRelated).join('')}
