@@ -611,11 +611,11 @@ function renderThemePicker() {
 // Style Picker (Interface texture/depth)
 // ---------------------------------------------------------------------------
 const STYLES = [
-  { id: 'original', name: 'Original', hint: 'Clean modern with grid pattern' },
-  { id: 'editorial', name: 'Editorial', hint: 'Linen paper & print typography' },
-  { id: 'soft-depth', name: 'Soft Depth', hint: 'Neumorphic shadows & noise texture' },
-  { id: 'tag', name: 'Tag Aesthetic', hint: 'Cork board & physical tag cards' },
-  { id: 'glass', name: 'Frosted Glass', hint: 'Acrylic blur & translucent surfaces' },
+  { id: 'original', name: 'Original', hint: 'Clean modern with grid pattern', preview: 'style-preview--original' },
+  { id: 'editorial', name: 'Editorial', hint: 'Linen paper & print typography', preview: 'style-preview--editorial' },
+  { id: 'soft-depth', name: 'Soft Depth', hint: 'Neumorphic shadows & noise texture', preview: 'style-preview--soft-depth' },
+  { id: 'tag', name: 'Tag Aesthetic', hint: 'Cork board & physical tag cards', preview: 'style-preview--tag' },
+  { id: 'glass', name: 'Frosted Glass', hint: 'Acrylic blur & translucent surfaces', preview: 'style-preview--glass' },
 ];
 
 function getCurrentStyle() {
@@ -634,17 +634,20 @@ function renderStylePicker() {
   const current = getCurrentStyle();
 
   grid.innerHTML = STYLES.map(s => `
-    <div class="theme-option${s.id === current ? ' selected' : ''}" data-style="${s.id}">
-      <div class="theme-option__name">${s.name}</div>
-      <div class="theme-option__desc">${s.hint}</div>
+    <div class="style-option${s.id === current ? ' selected' : ''}" data-style="${s.id}">
+      <div class="style-option__preview ${s.preview}"></div>
+      <div class="style-option__info">
+        <div class="style-option__name">${s.name}</div>
+        <div class="style-option__hint">${s.hint}</div>
+      </div>
     </div>
   `).join('');
 
-  grid.querySelectorAll('.theme-option').forEach(opt => {
+  grid.querySelectorAll('.style-option').forEach(opt => {
     opt.addEventListener('click', () => {
       const styleId = opt.dataset.style;
       setStyle(styleId);
-      document.querySelectorAll('#styleGrid .theme-option').forEach(o => o.classList.remove('selected'));
+      document.querySelectorAll('#styleGrid .style-option').forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
     });
   });
