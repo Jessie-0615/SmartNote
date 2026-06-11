@@ -35,7 +35,7 @@ function renderBrowse(container) {
       <div class="flex-between" style="flex-wrap:wrap;gap:var(--space-sm)">
         <span id="selectCount" style="font-weight:600;font-size:var(--font-size-sm)"></span>
         <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap">
-          <button class="btn btn--ghost btn--sm" id="selectUnexpandedBtn">Select All Unexpanded</button>
+          <button class="btn btn--outline btn--sm" id="selectUnexpandedBtn">Select All Unexpanded</button>
           <button class="btn btn--primary btn--sm" id="batchExpandBtn">Expand Selected</button>
           <button class="btn btn--ghost btn--sm" id="cancelSelectBtn">Cancel</button>
         </div>

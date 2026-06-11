@@ -27,7 +27,16 @@ async function renderNoteDetail(noteId) {
   }
 
   const info = categoryInfo(note.category || '');
-  const reviewText = relativeTime(note.nextReviewAt);
+
+  // Review progress dots (0-6, from consecutiveCorrect)
+  function reviewDots(cc) {
+    const total = 6; const filled = Math.min(cc || 0, total);
+    let d = '<span style="font-size:var(--font-size-xs);color:var(--text-tertiary);margin-right:6px">Review</span>';
+    for (let i = 0; i < total; i++) {
+      d += `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;background:${i < filled ? 'var(--primary)' : 'var(--border)'};transition:background 0.3s"></span>`;
+    }
+    return d;
+  }
 
   // Build expansion HTML
   let expansionHtml = '';
@@ -36,45 +45,47 @@ async function renderNoteDetail(noteId) {
     const renderExample = (ex) => {
       if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm);font-style:italic">${escapeHtml(ex)}</li>`;
       return `<li style="margin-bottom:var(--space-sm)">
-        <div style="font-style:italic;color:var(--color-text)">${escapeHtml(ex.en)}</div>
-        ${ex.zh ? `<div style="font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-top:2px">${escapeHtml(ex.zh)}</div>` : ''}
+        <div style="font-style:italic;color:var(--text)">${escapeHtml(ex.en)}</div>
+        ${ex.zh ? `<div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:2px">${escapeHtml(ex.zh)}</div>` : ''}
       </li>`;
     };
 
     // Helper: render related expression items
     const renderRelated = (r) => {
-      if (typeof r === 'string') return `<span class="badge" style="background:var(--color-primary-bg);color:var(--color-primary)">${escapeHtml(r)}</span>`;
-      return `<span class="badge" style="background:var(--color-primary-bg);color:var(--color-primary)">${escapeHtml(r.en)}${r.zh ? ' · ' + escapeHtml(r.zh) : ''}</span>`;
+      if (typeof r === 'string') return `<span class="badge" style="background:var(--primary-bg);color:var(--primary)">${escapeHtml(r)}</span>`;
+      return `<span class="badge" style="background:var(--primary-bg);color:var(--primary)">${escapeHtml(r.en)}${r.zh ? ' · ' + escapeHtml(r.zh) : ''}</span>`;
     };
 
     expansionHtml = `
-      <div class="card mt-md" style="border-left:4px solid var(--color-primary)">
-        <h3 style="margin-bottom:var(--space-md)">AI 扩展 · Expansion</h3>
+      <div class="card mt-md" style="border-left:4px solid var(--primary)">
+        <h3 style="margin-bottom:var(--space-md);display:flex;align-items:center;gap:var(--space-sm)">
+          <span style="font-size:1.1rem">✦</span> AI Expansion
+        </h3>
 
         ${note.aiChineseTranslation ? `
-          <div style="background:var(--color-primary-bg);padding:var(--space-md);border-radius:var(--radius-sm);margin-bottom:var(--space-md)">
-            <span style="font-size:var(--font-size-xs);font-weight:700;color:var(--color-primary)">中文翻译</span>
+          <div style="background:var(--primary-bg);padding:var(--space-md);border-radius:var(--radius-sm);margin-bottom:var(--space-md)">
+            <span style="font-size:var(--font-size-xs);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em">中文翻译</span>
             <p style="font-size:var(--font-size-lg);font-weight:600;margin-top:var(--space-xs)">${escapeHtml(note.aiChineseTranslation)}</p>
           </div>
         ` : ''}
 
         ${note.aiDefinition ? `
           <div class="expand-section open">
-            <div class="expand-section__header">中文释义 · Definition (CN)</div>
+            <div class="expand-section__header"><span class="expand-arrow">▾</span> 中文释义 · Definition (CN)</div>
             <div class="expand-section__body"><p style="font-size:var(--font-size-md);line-height:1.8">${escapeHtml(note.aiDefinition)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiDefinitionEn ? `
           <div class="expand-section">
-            <div class="expand-section__header">English Definition</div>
-            <div class="expand-section__body"><p style="color:var(--color-text-secondary)">${escapeHtml(note.aiDefinitionEn)}</p></div>
+            <div class="expand-section__header"><span class="expand-arrow">▸</span> English Definition</div>
+            <div class="expand-section__body"><p style="color:var(--text-secondary)">${escapeHtml(note.aiDefinitionEn)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiExamples && note.aiExamples.length ? `
           <div class="expand-section open">
-            <div class="expand-section__header">例句 · Example Sentences</div>
+            <div class="expand-section__header"><span class="expand-arrow">▾</span> 例句 · Example Sentences</div>
             <div class="expand-section__body">
               <ul style="list-style:none;padding-left:0">
                 ${note.aiExamples.map(renderExample).join('')}
@@ -85,14 +96,14 @@ async function renderNoteDetail(noteId) {
 
         ${note.aiEtymology ? `
           <div class="expand-section">
-            <div class="expand-section__header">词源 · Etymology</div>
+            <div class="expand-section__header"><span class="expand-arrow">▸</span> 词源 · Etymology</div>
             <div class="expand-section__body"><p>${escapeHtml(note.aiEtymology)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiRelatedExpressions && note.aiRelatedExpressions.length ? `
           <div class="expand-section open">
-            <div class="expand-section__header">相关表达 · Related Expressions</div>
+            <div class="expand-section__header"><span class="expand-arrow">▾</span> 相关表达 · Related Expressions</div>
             <div class="expand-section__body">
               <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm)">
                 ${note.aiRelatedExpressions.map(renderRelated).join('')}
@@ -117,9 +128,7 @@ async function renderNoteDetail(noteId) {
           </span>
           <button class="btn btn--ghost btn--sm" id="editMetaBtn" style="font-size:var(--font-size-xs)">Edit</button>
         </div>
-        <span style="font-size:var(--font-size-sm);color:var(--color-text-tertiary)">
-          Review: ${reviewText}
-        </span>
+        <span>${reviewDots(note.consecutiveCorrect)}</span>
       </div>
 
       <h2 style="font-size:var(--font-size-xl);margin-bottom:var(--space-md)">${escapeHtml(note.content)}</h2>
@@ -133,12 +142,6 @@ async function renderNoteDetail(noteId) {
       `}
 
       <div id="inlineEditArea" style="display:none"></div>
-
-      <div class="flex gap-sm mt-md" style="font-size:var(--font-size-xs);color:var(--color-text-tertiary)">
-        <span>Created: ${formatDate(note.createdAt)}</span>
-        ${note.repetitions > 0 ? `<span>· Reviewed ${note.repetitions}x</span>` : '<span>· Not yet reviewed</span>'}
-        <span>· Mastery: ${masteryLevel(note)}</span>
-      </div>
     </div>
 
     ${!note.aiExpanded ? `
@@ -147,7 +150,7 @@ async function renderNoteDetail(noteId) {
         <button class="btn btn--primary" id="expandBtn">
           Search AI 扩展 · Expand
         </button>
-        <p style="font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:var(--space-sm)">
+        <p style="font-size:var(--font-size-xs);color:var(--text-tertiary);margin-top:var(--space-sm)">
           AI将生成中文翻译、双语释义和例句，帮助理解和记忆。
         </p>
       </div>
@@ -157,7 +160,7 @@ async function renderNoteDetail(noteId) {
 
     <div class="flex gap-sm mt-lg">
       <button class="btn btn--outline" id="startReviewBtn">Review This</button>
-      <button class="btn btn--ghost" id="deleteNoteBtn" style="color:var(--color-danger)">Delete</button>
+      <button class="btn btn--ghost" id="deleteNoteBtn" style="color:var(--danger)">Delete</button>
     </div>
 
     <div id="expandFeedback" class="mt-md"></div>
@@ -244,10 +247,15 @@ async function renderNoteDetail(noteId) {
     });
   }
 
-  // Expandable section toggles
+  // Expandable section toggles — flip arrow icon
   container.querySelectorAll('.expand-section__header').forEach((header) => {
     header.addEventListener('click', () => {
-      header.parentElement.classList.toggle('open');
+      const section = header.parentElement;
+      section.classList.toggle('open');
+      const arrow = header.querySelector('.expand-arrow');
+      if (arrow) {
+        arrow.textContent = section.classList.contains('open') ? '▾' : '▸';
+      }
     });
   });
 

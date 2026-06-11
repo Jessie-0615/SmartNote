@@ -8,6 +8,56 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 // ---------------------------------------------------------------------------
+// Security: rate limiting (per-IP, in-memory)
+// ---------------------------------------------------------------------------
+const rateLimitMap = new Map();
+const RATE_LIMIT_MAX = 15;      // 15 requests
+const RATE_WINDOW_MS = 60_000;  // per minute
+const INPUT_MAX_LENGTH = 2000;  // max content length
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  let entry = rateLimitMap.get(ip);
+  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
+    entry = { windowStart: now, count: 0 };
+    rateLimitMap.set(ip, entry);
+  }
+  entry.count++;
+  // Cleanup old entries every 100 requests
+  if (Math.random() < 0.01) {
+    const cutoff = now - RATE_WINDOW_MS;
+    for (const [k, v] of rateLimitMap) {
+      if (v.windowStart < cutoff) rateLimitMap.delete(k);
+    }
+  }
+  return entry.count <= RATE_LIMIT_MAX;
+}
+
+// Sanitize input: strip HTML tags, control chars, limit length
+function sanitize(input) {
+  if (typeof input !== 'string') return '';
+  return input
+    .replace(/<[^>]*>/g, '')           // strip HTML tags
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '') // strip control chars
+    .slice(0, INPUT_MAX_LENGTH)
+    .trim();
+}
+
+// Blocklist: common attack patterns
+const BLOCKED_PATTERNS = [
+  /javascript\s*:/i,
+  /<script/i,
+  /on\w+\s*=/i,
+  /data\s*:/i,
+  /&#x/i,
+  /%3[Cc]/i,
+];
+
+function isBlocked(input) {
+  return BLOCKED_PATTERNS.some((p) => p.test(input));
+}
+
+// ---------------------------------------------------------------------------
 // Read request body
 // ---------------------------------------------------------------------------
 function readBody(req) {
@@ -237,16 +287,36 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // AI routes
+    // AI routes — rate limit + validate
     if (pathname === '/api/categorize' && req.method === 'POST') {
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+      if (!checkRateLimit(ip)) {
+        res.status(429).json({ error: 'Too many requests. Please slow down.' });
+        return;
+      }
       const body = await readBody(req);
+      if (isBlocked(body.content || '')) {
+        res.status(400).json({ error: 'Invalid input' });
+        return;
+      }
+      body.content = sanitize(body.content);
       const result = await handleCategorize(body, resolvedKey);
       res.status(result.status).json(result.body);
       return;
     }
 
     if (pathname === '/api/expand' && req.method === 'POST') {
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+      if (!checkRateLimit(ip)) {
+        res.status(429).json({ error: 'Too many requests. Please slow down.' });
+        return;
+      }
       const body = await readBody(req);
+      if (isBlocked(body.content || '')) {
+        res.status(400).json({ error: 'Invalid input' });
+        return;
+      }
+      body.content = sanitize(body.content);
       const result = await handleExpand(body, resolvedKey);
       res.status(result.status).json(result.body);
       return;
