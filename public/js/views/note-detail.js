@@ -41,13 +41,105 @@ async function renderNoteDetail(noteId) {
   // Build expansion HTML
   let expansionHtml = '';
   if (note.aiExpanded) {
-    // Highlight the original note text within an example sentence
+    // Generate morphological variant pattern for a single English word
+    const morphVariants = (word) => {
+      const w = word.toLowerCase();
+      const patterns = [w];
+      // Common suffixes
+      patterns.push(w + 's', w + 'es', w + 'ed', w + 'ing', w + 'er', w + 'est');
+      // Dropped-e forms (make → making, made; love → loved, loving)
+      if (w.endsWith('e') && w.length > 2) {
+        const stem = w.slice(0, -1);
+        patterns.push(stem + 's', stem + 'es', stem + 'ed', stem + 'ing', stem + 'er');
+      }
+      // Double final consonant (run → running, stop → stopped)
+      if (w.length >= 3 && /[aeiou][^aeiouwxy]$/.test(w)) {
+        const dbl = w + w[w.length - 1];
+        patterns.push(dbl + 'ed', dbl + 'ing', dbl + 'er');
+      }
+      // Y → I (carry → carries, carried)
+      if (w.endsWith('y') && w.length > 2 && !/[aeiou]y$/.test(w)) {
+        const stem = w.slice(0, -1);
+        patterns.push(stem + 'ies', stem + 'ied', stem + 'ier');
+      }
+      // Common irregular verbs
+      const IRREGULAR = {
+        'be': ['am','is','are','was','were','been','being'],
+        'have': ['has','had','having'],
+        'do': ['does','did','done','doing'],
+        'go': ['goes','went','gone','going'],
+        'make': ['makes','made','making'],
+        'take': ['takes','took','taken','taking'],
+        'get': ['gets','got','gotten','getting'],
+        'say': ['says','said','saying'],
+        'see': ['sees','saw','seen','seeing'],
+        'know': ['knows','knew','known','knowing'],
+        'think': ['thinks','thought','thinking'],
+        'come': ['comes','came','coming'],
+        'give': ['gives','gave','given','giving'],
+        'find': ['finds','found','finding'],
+        'tell': ['tells','told','telling'],
+        'feel': ['feels','felt','feeling'],
+        'leave': ['leaves','left','leaving'],
+        'keep': ['keeps','kept','keeping'],
+        'begin': ['begins','began','begun','beginning'],
+        'write': ['writes','wrote','written','writing'],
+        'run': ['runs','ran','running'],
+        'swim': ['swims','swam','swum','swimming'],
+        'sit': ['sits','sat','sitting'],
+        'speak': ['speaks','spoke','spoken','speaking'],
+        'break': ['breaks','broke','broken','breaking'],
+        'eat': ['eats','ate','eaten','eating'],
+        'drink': ['drinks','drank','drunk','drinking'],
+        'sing': ['sings','sang','sung','singing'],
+        'buy': ['buys','bought','buying'],
+        'bring': ['brings','brought','bringing'],
+        'catch': ['catches','caught','catching'],
+        'teach': ['teaches','taught','teaching'],
+        'build': ['builds','built','building'],
+        'send': ['sends','sent','sending'],
+        'spend': ['spends','spent','spending'],
+        'lose': ['loses','lost','losing'],
+        'choose': ['chooses','chose','chosen','choosing'],
+        'fall': ['falls','fell','fallen','falling'],
+        'fly': ['flies','flew','flown','flying'],
+        'grow': ['grows','grew','grown','growing'],
+        'draw': ['draws','drew','drawn','drawing'],
+        'show': ['shows','showed','shown','showing'],
+        'wear': ['wears','wore','worn','wearing'],
+        'put': ['puts','putting'],
+        'let': ['lets','letting'],
+        'set': ['sets','setting'],
+        'cut': ['cuts','cutting'],
+        'hit': ['hits','hitting'],
+        'win': ['wins','won','winning'],
+      };
+      if (IRREGULAR[w]) patterns.push(...IRREGULAR[w]);
+      // Deduplicate and return as regex alternation
+      const unique = [...new Set(patterns)];
+      return unique.sort((a,b) => b.length - a.length).join('|');
+    };
+
+    // Highlight the original note text with morphological variant matching
     const highlightNote = (text) => {
+      if (!text || !note.content || !note.content.trim()) return escapeHtml(text);
       const escaped = escapeHtml(text);
-      const noteText = escapeHtml(note.content);
-      // Case-insensitive match, preserve original casing from example
-      const regex = new RegExp(`(${noteText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      return escaped.replace(regex, '<span style="font-weight:700;color:var(--primary)">$1</span>');
+      const noteWords = note.content.trim().split(/\s+/).filter(w => w.length > 0);
+
+      // Build per-word variant patterns
+      const wordPatterns = noteWords.map(w => morphVariants(w));
+
+      // Pass 1: try to match the full phrase (words in order, allowing variants, up to 3 filler words between)
+      const phrasePattern = wordPatterns.map(p => `\\b(?:${p})\\b`).join('(?:\\s+\\w+){0,3}\\s+');
+      const phraseRegex = new RegExp(`(${phrasePattern})`, 'gi');
+      let result = escaped.replace(phraseRegex, '<span style="font-weight:700;color:var(--primary)">$1</span>');
+      if (result !== escaped) return result; // Phrase match found — highlight and return
+
+      // Pass 2: no full phrase match — highlight each note word independently
+      const anyWordPattern = wordPatterns.map(p => `\\b(?:${p})\\b`).join('|');
+      const anyRegex = new RegExp(`(${anyWordPattern})`, 'gi');
+      result = escaped.replace(anyRegex, '<span style="font-weight:700;color:var(--primary)">$1</span>');
+      return result;
     };
 
     // Helper: render example items (supports both string and {en, zh} formats)

@@ -14,7 +14,7 @@ async function renderSettings(container) {
       <h3 style="font-size:var(--font-size-md)">DeepSeek API Key</h3>
       <p class="text-secondary" style="font-size:var(--font-size-sm)">
         Your key is stored locally in this browser only. Get a free key (5M tokens, no credit card) at
-        <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener" style="color:var(--color-primary)">platform.deepseek.com</a>
+        <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline">platform.deepseek.com</a>
       </p>
       <div class="form-group mt-md" style="margin-bottom:var(--space-sm)">
         <input
@@ -111,19 +111,21 @@ async function renderSettings(container) {
 
     <!-- Version History -->
     <div class="card">
-      <div class="flex-between">
-        <h3 style="font-size:var(--font-size-md)">Version History</h3>
+      <div class="flex-between" id="versionHistoryHeader" style="cursor:pointer">
+        <h3 style="font-size:var(--font-size-md)">Version History <span id="versionHistoryArrow" style="font-size:0.8rem">▸</span></h3>
         <span id="gitStatusDot" style="width:10px;height:10px;border-radius:50%;background:var(--text-tertiary);display:inline-block;flex-shrink:0" title="Backend status"></span>
       </div>
-      <p class="text-secondary" style="font-size:var(--font-size-sm)">
-        Save checkpoints of your project and restore to previous versions if needed.
-      </p>
-      <div class="flex gap-sm mt-md" style="flex-wrap:wrap">
-        <button class="btn btn--primary btn--sm" id="saveCheckpointBtn">Save Checkpoint</button>
-        <button class="btn btn--ghost btn--sm" id="refreshCheckpointsBtn">Refresh</button>
-      </div>
-      <div id="checkpointList" class="mt-md">
-        <p class="text-secondary" style="font-size:var(--font-size-sm)">Loading...</p>
+      <div id="versionHistoryBody" style="display:none">
+        <p class="text-secondary" style="font-size:var(--font-size-sm);margin-top:var(--space-sm)">
+          Save checkpoints of your project and restore to previous versions if needed.
+        </p>
+        <div class="flex gap-sm mt-md" style="flex-wrap:wrap">
+          <button class="btn btn--primary btn--sm" id="saveCheckpointBtn">Save Checkpoint</button>
+          <button class="btn btn--ghost btn--sm" id="refreshCheckpointsBtn">Refresh</button>
+        </div>
+        <div id="checkpointList" class="mt-md">
+          <p class="text-secondary" style="font-size:var(--font-size-sm)">Loading...</p>
+        </div>
       </div>
     </div>
   `;
@@ -403,7 +405,10 @@ async function renderSyncUI() {
             ${pairedDevices.map(d => `
               <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card-bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
                 <span style="font-size:var(--font-size-sm)">${escapeHtml(d.deviceName)}${d.isMe ? ' <span class="text-secondary">(you)</span>' : ''}</span>
-                <span class="text-secondary" style="font-size:var(--font-size-xs)">${d.lastSyncAt ? 'Last sync: ' + formatDate(d.lastSyncAt) : 'Never synced'}</span>
+                <div style="display:flex;align-items:center;gap:var(--space-sm)">
+                  <span class="text-secondary" style="font-size:var(--font-size-xs)">${d.lastSyncAt ? 'Last sync: ' + formatDate(d.lastSyncAt) : 'Never synced'}</span>
+                  ${!d.isMe ? `<button class="btn btn--ghost btn--sm unpair-device-btn" data-device-id="${escapeHtml(d.deviceId)}" data-device-name="${escapeHtml(d.deviceName)}" style="color:var(--danger);font-size:var(--font-size-xs);padding:2px 8px">✕</button>` : ''}
+                </div>
               </div>
             `).join('')}
           </div>
@@ -429,6 +434,33 @@ async function renderSyncUI() {
       navigator.clipboard.writeText(pairingCode).then(() => {
         showToast('Code copied!', 'success');
       }).catch(() => showToast('Failed to copy', 'error'));
+    });
+
+    // Per-device unpair buttons
+    container.querySelectorAll('.unpair-device-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const deviceId = btn.dataset.deviceId;
+        const deviceName = btn.dataset.deviceName;
+        const confirmed = await confirmDialog(
+          'Remove Device',
+          `Remove "${deviceName}" from your paired devices?`,
+          'Remove',
+          true
+        );
+        if (!confirmed) return;
+        try {
+          const res = await fetch('/api/sync/unpair', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deviceId }),
+          });
+          if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Failed'); }
+          showToast('Device removed!', 'success');
+          renderSyncUI();
+        } catch (err) {
+          showToast('Remove failed: ' + err.message, 'error');
+        }
+      });
     });
 
     document.getElementById('syncNowBtn')?.addEventListener('click', async () => {
@@ -732,6 +764,18 @@ async function loadCheckpoints() {
 
 // Wire up version history buttons (called from renderSettings after DOM is ready)
 function initVersionHistory() {
+  // Toggle collapse
+  const header = document.getElementById('versionHistoryHeader');
+  const body = document.getElementById('versionHistoryBody');
+  const arrow = document.getElementById('versionHistoryArrow');
+  if (header && body) {
+    header.addEventListener('click', () => {
+      const open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : 'block';
+      if (arrow) arrow.textContent = open ? '▸' : '▾';
+    });
+  }
+
   document.getElementById('saveCheckpointBtn')?.addEventListener('click', async () => {
     const btn = document.getElementById('saveCheckpointBtn');
     btn.disabled = true;
