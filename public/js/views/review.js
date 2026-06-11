@@ -228,7 +228,7 @@ function renderSessionComplete(container) {
         <div class="review-complete__ring"></div>
         <div class="review-complete__ring"></div>
         <div class="review-complete__ring"></div>
-        <div class="review-complete__check">~</div>
+        <div class="review-complete__check">✦</div>
       </div>
 
       <h3 style="color:var(--primary);margin-bottom:var(--space-sm)">Session Complete</h3>

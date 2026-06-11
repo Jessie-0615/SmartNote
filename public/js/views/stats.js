@@ -32,10 +32,6 @@ async function renderStats(container) {
         <div class="stat-card__value" id="statAvgEase">—</div>
         <div class="stat-card__label">Avg. Ease Factor</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card__value" id="statMastery">—%</div>
-        <div class="stat-card__label">Mastery Rate</div>
-      </div>
     </div>
 
     <!-- Chart: Entries Added -->
@@ -50,11 +46,6 @@ async function renderStats(container) {
       <canvas id="chartReviews" style="width:100%;height:240px"></canvas>
     </div>
 
-    <!-- Chart: Mastery Distribution -->
-    <div class="chart-container">
-      <h3>Mastery Distribution</h3>
-      <canvas id="chartMastery" style="width:100%;height:260px"></canvas>
-    </div>
   `;
 
   // Default: weekly
@@ -99,10 +90,9 @@ async function loadStats(period) {
   }
 
   // Fetch data
-  const [notesInRange, reviewsInRange, mastery] = await Promise.all([
+  const [notesInRange, reviewsInRange] = await Promise.all([
     getNotesCreatedInRange(start, now),
     getReviewsInRange(start, now),
-    getMasteryDistribution(),
   ]);
 
   // Summary metrics
@@ -114,14 +104,10 @@ async function loadStats(period) {
   const avgEase = allNotes.length
     ? (allNotes.reduce((s, n) => s + (n.easeFactor || 2.5), 0) / allNotes.length).toFixed(1)
     : '2.5';
-  const masteryRate = allNotes.length
-    ? Math.round((allNotes.filter((n) => n.repetitions >= 4).length / allNotes.length) * 100)
-    : 0;
 
   document.getElementById('statTotalNotes').textContent = totalNotes;
   document.getElementById('statTotalReviews').textContent = totalReviews;
   document.getElementById('statAvgEase').textContent = avgEase;
-  document.getElementById('statMastery').textContent = masteryRate + '%';
 
   // Aggregate into buckets
   const buckets = getBuckets(period, start, bucketFn);
@@ -132,25 +118,11 @@ async function loadStats(period) {
   renderBarChart(document.getElementById('chartEntries'), entryData);
   renderBarChart(document.getElementById('chartReviews'), reviewData);
 
-  // Mastery donut
-  renderDonutChart(document.getElementById('chartMastery'), [
-    { label: 'Not Reviewed', value: mastery.unreviewed, color: getThemeColor('--text-tertiary') || '#d1d1d6' },
-    { label: 'Learning', value: mastery.learning, color: getThemeColor('--primary') || '#E56A79' },
-    { label: 'Known', value: mastery.known, color: getThemeColor('--warning') || '#ff9500' },
-    { label: 'Mastered', value: mastery.mastered, color: getThemeColor('--success') || '#34c759' },
-  ]);
-
   // Re-render charts on resize
   const handleResize = debounce(() => {
     if (document.getElementById('chartEntries')) {
       renderBarChart(document.getElementById('chartEntries'), entryData);
       renderBarChart(document.getElementById('chartReviews'), reviewData);
-      renderDonutChart(document.getElementById('chartMastery'), [
-        { label: 'Not Reviewed', value: mastery.unreviewed, color: '#d1d1d6' },
-        { label: 'Learning', value: mastery.learning, color: '#4a90d9' },
-        { label: 'Known', value: mastery.known, color: '#ff9500' },
-        { label: 'Mastered', value: mastery.mastered, color: '#34c759' },
-      ]);
     }
   }, 250);
 
