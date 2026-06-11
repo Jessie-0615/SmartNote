@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design A — Soft Rounded</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: #ECE2D0;
+    color: #3A2E2A;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Dot Pattern Background ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12;
+    background-image: radial-gradient(circle, #992E2E 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 20px; }
+
+  /* ── Header ── */
+  .header {
+    text-align: center; padding: 30px 0 20px;
+  }
+  .header h1 {
+    font-size: 2rem; font-weight: 700; color: #992E2E;
+    letter-spacing: -0.02em;
+  }
+  .header span { font-size: 0.85rem; color: #8B7068; }
+
+  /* ── Note Card ── */
+  .note-card {
+    background: linear-gradient(135deg, #FFFAF5, #F6ECEC);
+    border-radius: 18px; padding: 20px 22px;
+    box-shadow: 0 4px 20px rgba(153,46,46,0.08);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px;
+    position: relative; overflow: hidden;
+    animation: cardIn 0.5s ease;
+    border: 1px solid rgba(229,217,200,0.5);
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .note-card .dot-accent {
+    position: absolute; top: -20px; right: -20px;
+    width: 70px; height: 70px; border-radius: 50%;
+    background: rgba(153,188,215,0.3);
+    pointer-events: none;
+  }
+  .note-card .content { flex: 1; min-width: 0; }
+  .note-card .english { font-size: 1.15rem; font-weight: 700; }
+  .note-card .chinese { font-size: 0.8rem; color: #8B7068; margin-top: 4px; }
+  .note-card .badge {
+    padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+    background: #F6ECEC; color: #992E2E; white-space: nowrap;
+  }
+
+  /* ── Review Card ── */
+  .review-card {
+    background: linear-gradient(135deg, #FFFAF5, #F6ECEC);
+    border-radius: 20px; padding: 40px 28px;
+    box-shadow: 0 8px 32px rgba(153,46,46,0.1);
+    text-align: center; min-height: 260px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; margin-bottom: 16px;
+    border: 1px solid rgba(229,217,200,0.5);
+    animation: floatIn 0.6s ease;
+  }
+  @keyframes floatIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .review-card .word { font-size: 2rem; font-weight: 700; }
+  .review-card .hint { font-size: 0.75rem; color: #BFABA0; margin-top: 12px; }
+  .review-card .actions {
+    display: flex; gap: 10px; margin-top: 20px; padding-top: 16px;
+    border-top: 1px solid #E5D9C8;
+  }
+  .review-card .actions button {
+    flex: 1; padding: 12px; border-radius: 14px; border: none;
+    font-family: 'Quicksand', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline {
+    background: #FFFAF5; color: #992E2E; border: 2px solid #E5D9C8 !important;
+  }
+  .btn-primary {
+    background: #992E2E; color: #fff;
+  }
+  .btn-primary:hover { background: #7A2525; }
+  .btn-outline:hover { background: #F6ECEC; }
+
+  /* ── Nav ── */
+  .nav {
+    display: flex; gap: 0; background: #FFFAF5;
+    border-radius: 20px; padding: 6px; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    position: sticky; bottom: 20px;
+  }
+  .nav button {
+    flex: 1; padding: 12px 8px; border: none; background: transparent;
+    font-family: 'Quicksand', sans-serif; font-size: 0.75rem; font-weight: 600;
+    color: #8B7068; border-radius: 16px; cursor: pointer; transition: all 0.2s;
+  }
+  .nav button.active { background: #F6ECEC; color: #992E2E; }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: #992E2E; margin: 24px 0 10px;
+    padding-left: 4px;
+  }
+
+  /* ── Bouncy icon ── */
+  .bouncy {
+    display: inline-block; animation: bounce 2s ease infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-6px); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1><span class="bouncy">~</span> SmartNote</h1>
+    <span>learn at your own pace</span>
+  </div>
+
+  <div class="section-label">Browse Cards</div>
+  <div class="note-card">
+    <div class="dot-accent"></div>
+    <div class="content">
+      <div class="english">serendipity</div>
+      <div class="chinese">意外发现美好事物的能力</div>
+    </div>
+    <span class="badge">Word</span>
+  </div>
+  <div class="note-card" style="animation-delay:0.1s">
+    <div class="dot-accent"></div>
+    <div class="content">
+      <div class="english">take off</div>
+      <div class="chinese">起飞；脱下</div>
+    </div>
+    <span class="badge">Phrase</span>
+  </div>
+
+  <div class="section-label">Review Card</div>
+  <div class="review-card">
+    <div class="word">serendipity</div>
+    <div class="hint">tap to reveal definition</div>
+    <div class="actions">
+      <button class="btn-outline">Don't Remember</button>
+      <button class="btn-primary">Remember</button>
+    </div>
+  </div>
+
+  <div style="height:20px"></div>
+  <div class="nav">
+    <button class="active">Add</button>
+    <button>Browse</button>
+    <button>Review</button>
+    <button>Stats</button>
+    <button>Settings</button>
+  </div>
+
+  <p style="text-align:center;margin-top:24px;font-size:0.7rem;color:#BFABAO">
+    Design A — Soft Rounded · Quicksand font · Dot pattern · Bouncy
+  </p>
+</div>
+</body>
+</html>

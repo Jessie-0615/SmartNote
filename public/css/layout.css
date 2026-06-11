@@ -1,0 +1,213 @@
+/* ---------------------------------------------------------------------------
+   Layout: App Shell + Left Sidebar Navigation
+   --------------------------------------------------------------------------- */
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Subtle grid pattern overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.04;
+  background-image:
+    linear-gradient(var(--text) 0.5px, transparent 0.5px),
+    linear-gradient(to right, var(--text) 0.5px, transparent 0.5px);
+  background-size: 36px 36px;
+}
+
+#app {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  z-index: 1;
+}
+
+.app-header {
+  display: none;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  max-width: var(--content-max);
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---- Sidebar ---- */
+.bottom-nav {
+  display: flex;
+  flex-direction: column;
+  order: -1;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: var(--sidebar-width);
+  background: var(--nav-bg);
+  border-right: 1px solid var(--border);
+  padding: var(--space-lg) 0;
+  gap: var(--space-xs);
+  z-index: var(--z-nav);
+  flex-shrink: 0;
+}
+
+.bottom-nav::before {
+  content: 'SmartNote';
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  padding: 0 var(--space-lg) var(--space-lg);
+  color: var(--primary);
+  letter-spacing: 0.01em;
+}
+
+.bottom-nav__item {
+  flex: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px var(--space-lg);
+  color: var(--nav-text);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  border-right: 2px solid transparent;
+  cursor: pointer;
+}
+
+.bottom-nav__item:hover {
+  color: var(--nav-text-hover);
+  background: var(--nav-active-bg);
+}
+
+.bottom-nav__item.active {
+  color: var(--nav-text-active);
+  background: var(--nav-active-bg);
+  border-right-color: var(--nav-active-border);
+}
+
+.bottom-nav__item .label {
+  white-space: nowrap;
+}
+
+/* ---- View Container ---- */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ---- Page Header ---- */
+.page-header { margin-bottom: var(--space-lg); }
+.page-header h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--primary); }
+.page-header p { color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--space-xs); }
+
+/* ---- Cards (frosted glass) ---- */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.04);
+  border: 1px solid var(--border);
+}
+.card + .card { margin-top: var(--space-md); }
+
+/* ---- Empty State ---- */
+.empty-state { text-align: center; padding: var(--space-2xl) var(--space-lg); color: var(--text-secondary); }
+.empty-state .icon { font-size: 3rem; margin-bottom: var(--space-md); opacity: 0.4; }
+.empty-state h3 { margin-bottom: var(--space-sm); color: var(--text); }
+.empty-state p { font-size: var(--font-size-sm); }
+
+/* ---- Badges ---- */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: var(--radius-sm);
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.badge--word { background: var(--badge-word-bg); color: var(--badge-word-text); }
+.badge--phrase { background: var(--badge-phrase-bg); color: var(--badge-phrase-text); }
+.badge--sentence_pattern { background: var(--badge-pattern-bg); color: var(--badge-pattern-text); }
+.badge--idiom { background: var(--badge-idiom-bg); color: var(--badge-idiom-text); }
+.badge--common_usage { background: var(--badge-usage-bg); color: var(--badge-usage-text); }
+
+/* ---- Filter Pills ---- */
+.filter-pills {
+  display: flex; gap: var(--space-sm); overflow-x: auto;
+  padding-bottom: var(--space-sm); -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.filter-pills::-webkit-scrollbar { display: none; }
+.pill {
+  display: inline-flex; align-items: center;
+  padding: 5px 14px; border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs); font-weight: 600; white-space: nowrap;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-secondary); transition: all var(--transition-fast);
+  cursor: pointer; user-select: none; letter-spacing: 0.03em;
+}
+.pill:hover { border-color: var(--text); color: var(--text); }
+.pill.active { background: var(--text); border-color: var(--text); color: var(--surface); }
+
+/* ---- Responsive ---- */
+
+/* Mobile: top nav bar */
+@media (max-width: 767px) {
+  :root { --sidebar-width: 100%; }
+  #app { flex-direction: column; }
+  .bottom-nav {
+    flex-direction: row;
+    position: sticky; top: 0;
+    height: auto; width: 100%;
+    padding: 0; gap: 0;
+    padding-top: env(safe-area-inset-top);
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--nav-bg);
+    overflow-x: auto;
+    z-index: var(--z-nav);
+  }
+  .bottom-nav::before { content: none; }
+  .bottom-nav__item {
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 6px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--nav-text);
+    border-right: none !important; border-left: none !important;
+    border-bottom: 2px solid transparent;
+    flex: 1; min-width: 0; text-align: center;
+  }
+  .bottom-nav__item.active {
+    border-right: none !important; border-left: none !important;
+    border-bottom-color: var(--nav-active-border);
+    color: var(--nav-text-active);
+    background: transparent;
+  }
+  .bottom-nav__item .label { font-size: 10px; }
+  .main-content { padding: var(--space-md); padding-bottom: var(--space-md); max-width: none; }
+}
+
+/* Tablet: left sidebar */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root { --sidebar-width: 180px; }
+  .bottom-nav__item { padding: 10px var(--space-md); font-size: var(--font-size-sm); }
+  .main-content { padding: var(--space-lg); max-width: none; }
+}
+
+/* Desktop: left sidebar */
+@media (min-width: 1024px) {
+  :root { --sidebar-width: 220px; }
+  .main-content { padding: var(--space-2xl); }
+}

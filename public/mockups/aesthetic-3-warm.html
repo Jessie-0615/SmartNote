@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 3 — Warm &amp; Inviting</title>
+<style>
+  :root {
+    --bg: #fef9f4;
+    --surface: #ffffff;
+    --border: #f0e4d4;
+    --text: #3d2e1f;
+    --text-muted: #a68b6f;
+    --primary: #e8835e;
+    --primary-bg: #fff0e8;
+    --word: #e8835e;
+    --phrase: #e8709e;
+    --pattern: #9b7ed8;
+    --idiom: #f0a050;
+    --usage: #5eb89b;
+    --font: 'SF Pro Rounded', -apple-system, 'PingFang SC', sans-serif;
+    --sidebar-w: 200px;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: var(--sidebar-w); background: #fffaf6;
+    border-right: 1px solid var(--border);
+    padding: 28px 0; display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar-brand {
+    font-size: 1.1rem; font-weight: 800;
+    color: var(--primary);
+    padding: 0 24px 20px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; margin: 2px 12px;
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--text-muted); cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.2s;
+  }
+  .nav-item.active { background: var(--primary-bg); color: var(--primary); }
+  .nav-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
+  .main { flex: 1; padding: 36px 48px; max-width: 800px; }
+
+  .page-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 2px; }
+  .page-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
+
+  .toggle-row { display: flex; gap: 6px; margin-bottom: 22px; }
+  .toggle-btn {
+    padding: 8px 20px; font-size: 0.8rem; font-weight: 700;
+    font-family: var(--font); cursor: pointer;
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 20px; color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .toggle-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .section { margin-bottom: 28px; }
+  .section-header {
+    font-size: 0.85rem; font-weight: 800;
+    padding: 12px 18px; border-radius: var(--radius) var(--radius) 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0;
+  }
+  .section-header.word { background: #fff0e8; color: #c95d38; }
+  .section-header.phrase { background: #ffe8f0; color: #c94e78; }
+  .section-header.idiom { background: #fff4e0; color: #c97820; }
+  .section-header .count { font-size: 0.72rem; opacity: 0.7; }
+
+  .section-body { background: var(--surface); border-radius: 0 0 var(--radius) var(--radius); border: 1px solid var(--border); border-top: none; overflow: hidden; }
+  .item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; cursor: pointer;
+    border-bottom: 1px solid #faf5ef;
+    transition: background 0.15s;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: #fffaf6; }
+  .item-main { flex: 1; min-width: 0; }
+  .item-title { font-size: 0.95rem; font-weight: 700; }
+  .item-zh { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+  .item-meta { font-size: 0.7rem; color: #cfbfb0; flex-shrink: 0; margin-left: 16px; text-align: right; }
+
+  .back-link { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 4px; }
+  .detail-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 20px; }
+  .detail-badge { display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 4px 14px; border-radius: 20px; background: #fff0e8; color: #c95d38; margin-bottom: 16px; }
+  .detail-word { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+  .detail-zh { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; }
+  .memo-box { background: #fffef5; border: 2px dashed #f5d680; border-radius: 10px; padding: 16px 20px; margin-top: 16px; font-size: 0.82rem; color: #8b7500; }
+  .memo-box::before { content: '🔒 Your Note'; display: block; font-size: 0.65rem; font-weight: 700; margin-bottom: 6px; color: #c9a830; }
+
+  .expansion { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 28px; margin-top: 16px; }
+  .expansion h3 { font-size: 0.9rem; font-weight: 800; margin-bottom: 18px; }
+  .exp-section { margin-bottom: 14px; }
+  .exp-section summary { font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 6px 0; color: var(--text); }
+  .exp-section p, .exp-section li { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; line-height: 1.6; }
+  .exp-section ul { padding-left: 18px; }
+  .exp-section li { margin-bottom: 5px; }
+  .exp-section li .zh { display: block; font-size: 0.75rem; color: #cfbfb0; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 24px; }
+  .btn {
+    padding: 12px 28px; font-family: var(--font); font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; border: none; border-radius: 24px;
+    background: var(--primary-bg); color: var(--primary);
+    transition: all 0.2s;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .btn.primary { background: var(--primary); color: #fff; }
+  .btn.danger { background: transparent; color: #e05050; }
+
+  @media (max-width: 640px) {
+    .app { flex-direction: column; }
+    .sidebar { flex-direction: row; height: auto; width: 100%; position: static; padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); gap: 0; }
+    .sidebar-brand { display: none; }
+    .nav-item { flex-direction: column; font-size: 0.6rem; padding: 6px 4px; gap: 2px; margin: 0 2px; flex: 1; text-align: center; }
+    .nav-item .icon { font-size: 1.1rem; width: auto; }
+    .main { padding: 16px 14px; }
+    .detail-word { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-brand">📚 EngNotes</div>
+    <div class="nav-item"><span class="icon">✏️</span>Add</div>
+    <div class="nav-item active"><span class="icon">📂</span>Browse</div>
+    <div class="nav-item"><span class="icon">🔄</span>Review</div>
+    <div class="nav-item"><span class="icon">📊</span>Stats</div>
+    <div class="nav-item"><span class="icon">⚙️</span>Settings</div>
+  </nav>
+
+  <main class="main">
+    <!-- BROWSE -->
+    <h1 class="page-title">Browse Notes</h1>
+    <p class="page-sub">Your English learning notebook 📒</p>
+
+    <div class="toggle-row">
+      <button class="toggle-btn">📋 List</button>
+      <button class="toggle-btn active">📒 Notebook</button>
+    </div>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:22px">12 notes</p>
+
+    <div class="section">
+      <div class="section-header word">🔤 Word <span class="count">5 notes</span></div>
+      <div class="section-body">
+        <div class="item"><div class="item-main"><div class="item-title">serendipity</div><div class="item-zh">意外发现美好事物的能力；机缘巧合</div></div><div class="item-meta">📖 🇨🇳<br>Tomorrow</div></div>
+        <div class="item"><div class="item-main"><div class="item-title">eloquent</div><div class="item-zh">口才流利的；有说服力的</div></div><div class="item-meta">📖<br>in 3 days</div></div>
+        <div class="item"><div class="item-main"><div class="item-title">ephemeral</div><div class="item-zh">短暂的；转瞬即逝的</div></div><div class="item-meta">📖 🇨🇳<br>Today</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header phrase">💬 Phrase <span class="count">3 notes</span></div>
+      <div class="section-body">
+        <div class="item"><div class="item-main"><div class="item-title">in the meantime</div><div class="item-zh">在此期间；同时</div></div><div class="item-meta">📖 🇨🇳<br>Today</div></div>
+        <div class="item"><div class="item-main"><div class="item-title">take it with a grain of salt</div><div class="item-zh">持保留态度；不完全相信</div></div><div class="item-meta"><br>Yesterday</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header idiom">🎭 Idiom <span class="count">2 notes</span></div>
+      <div class="section-body">
+        <div class="item"><div class="item-main"><div class="item-title">break the ice</div><div class="item-zh">打破沉默；化解僵局</div></div><div class="item-meta">📖 🇨🇳<br>Today</div></div>
+      </div>
+    </div>
+
+    <!-- NOTE DETAIL -->
+    <p style="margin-top:48px;border-top:2px solid var(--border);padding-top:28px;font-weight:700;font-size:0.85rem;color:var(--text-muted)">Note Detail ↓</p>
+
+    <div style="margin-top:16px">
+      <span class="back-link">← Back to Browse</span>
+      <div class="detail-card">
+        <span class="detail-badge">🔤 Word</span>
+        <h2 class="detail-word">serendipity</h2>
+        <div class="detail-zh">意外发现美好事物的能力；机缘巧合</div>
+        <div class="memo-box">Heard from a YouTuber explaining how he found his dream job — total serendipity.</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:20px">Created: 06-09 · Not reviewed yet</div>
+      </div>
+
+      <div class="expansion">
+        <h3>📖 AI 扩展 · Expansion</h3>
+        <details class="exp-section" open><summary>📕 中文释义</summary><p>指在寻找其他东西时，意外发现有趣或有价值事物的能力或运气。源于波斯童话《锡兰三王子》。</p></details>
+        <details class="exp-section"><summary>📕 English Definition</summary><p>The occurrence of events by chance in a happy or beneficial way.</p></details>
+        <details class="exp-section" open><summary>💡 例句</summary><ul>
+          <li>It was pure serendipity that I found this book. <span class="zh">我在二手书店找到这本书纯属机缘巧合。</span></li>
+          <li>Scientific discoveries often involve serendipity. <span class="zh">科学发现往往包含着意外发现的成分。</span></li>
+          <li>Meeting her was the greatest serendipity of my life. <span class="zh">遇见她是我人生中最美好的意外。</span></li>
+        </ul></details>
+        <details class="exp-section"><summary>📜 词源</summary><p>源自1754年霍勒斯·沃波尔创造，受波斯童话《锡兰三王子》启发。</p></details>
+        <details class="exp-section" open><summary>🔗 相关表达</summary><p style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="background:var(--primary-bg);padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:600">chance · 偶然</span>
+          <span style="background:var(--primary-bg);padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:600">fortune · 运气</span>
+          <span style="background:var(--primary-bg);padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:600">happy accident · 美好意外</span>
+        </p></details>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary">🔄 Review This</button>
+        <button class="btn danger">🗑️ Delete</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<p style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">
+  Aesthetic 3 — <strong>Warm &amp; Inviting</strong> — Rounded everything, pastel category colors, friendly typography, soft shadows. Feels like a cozy study companion app.
+</p>
+</body>
+</html>

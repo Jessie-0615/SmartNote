@@ -1,0 +1,20 @@
+{
+  "name": "english-learning-app",
+  "version": "1.0.0",
+  "description": "English Learning Note & Review Web App with AI-powered categorization and spaced repetition",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "english",
+    "learning",
+    "spaced-repetition",
+    "pwa"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.10.0"
+  }
+}

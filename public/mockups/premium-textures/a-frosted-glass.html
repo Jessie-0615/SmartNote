@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup A — Frosted Glass (Acrylic)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --font-body: 'DM Sans', -apple-system, sans-serif;
+    --font-display: 'DM Serif Display', 'Times New Roman', serif;
+    --primary: #E56A79;
+    --accent: #F7BE98;
+    --text: #262626;
+    --text-secondary: #5C4430;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--text);
+    background: linear-gradient(135deg, #F7BE98 0%, #F5D4B8 30%, #E8C8D0 60%, #D4C8E0 100%);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Ambient glow orbs behind everything */
+  body::before {
+    content: '';
+    position: fixed;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229,106,121,0.25) 0%, transparent 70%);
+    top: -80px; right: -80px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(247,190,152,0.30) 0%, transparent 70%);
+    bottom: -60px; left: -60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .app {
+    display: flex;
+    min-height: 100vh;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Sidebar: frosted dark glass ── */
+  .sidebar {
+    width: 220px;
+    background: rgba(40,35,50,0.75);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border-right: 1px solid rgba(255,255,255,0.10);
+    display: flex; flex-direction: column;
+    padding: 32px 0;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .sidebar::before {
+    content: 'SmartNote';
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: rgba(255,255,255,0.92);
+    padding: 0 24px 24px;
+    letter-spacing: 0.02em;
+  }
+  .nav-item {
+    padding: 10px 24px;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    border-right: 2px solid transparent;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.04); }
+  .nav-item.active {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+    border-right-color: rgba(229,106,121,0.8);
+  }
+
+  /* ── Main content ── */
+  .main {
+    flex: 1; padding: 40px;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: rgba(38,38,38,0.88);
+    margin-bottom: 6px;
+  }
+  .page-subtitle {
+    font-size: 0.85rem;
+    color: rgba(92,68,48,0.7);
+    margin-bottom: 28px;
+  }
+
+  /* ── Frosted Glass Card ── */
+  .glass-card {
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.3) inset,
+      0 2px 8px rgba(0,0,0,0.04),
+      0 8px 32px rgba(0,0,0,0.06);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .glass-card:hover {
+    background: rgba(255,255,255,0.55);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.4) inset,
+      0 4px 16px rgba(0,0,0,0.06),
+      0 12px 40px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+
+  .glass-card__accent {
+    position: absolute;
+    left: 0; top: 14px; bottom: 14px;
+    width: 3px;
+    background: var(--primary);
+    border-radius: 0 2px 2px 0;
+  }
+  .glass-card__body { padding-left: 12px; }
+  .glass-card__content {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .glass-card__memo {
+    font-size: 0.8rem;
+    color: rgba(92,68,48,0.65);
+  }
+
+  /* ── Review Card: thicker glass ── */
+  .review-stack {
+    position: relative;
+    max-width: 420px;
+    margin: 20px auto;
+    perspective: 1200px;
+  }
+  .review-ghost {
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+  }
+  .review-ghost--1 {
+    transform: rotate(-1.8deg) translateY(6px);
+    opacity: 0.5; z-index: 0;
+  }
+  .review-ghost--2 {
+    transform: rotate(1.2deg) translateY(3px);
+    opacity: 0.3; z-index: -1;
+  }
+  .review-active {
+    position: relative; z-index: 1;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(22px) saturate(130%);
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.35) inset,
+      0 4px 20px rgba(0,0,0,0.06),
+      0 12px 40px rgba(0,0,0,0.08);
+    min-height: 300px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 36px;
+    text-align: center;
+  }
+  .review-active__text {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: #1a1a1a;
+    line-height: 1.3;
+  }
+  .review-active__hint {
+    margin-top: 18px;
+    font-size: 0.75rem;
+    color: rgba(92,68,48,0.45);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── Action buttons ── */
+  .review-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    width: 100%;
+  }
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.18s;
+    border: 1px solid transparent;
+  }
+  .btn--outline {
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-color: rgba(229,106,121,0.35);
+    color: var(--primary);
+  }
+  .btn--outline:hover {
+    background: rgba(229,106,121,0.08);
+  }
+  .btn--primary {
+    background: rgba(229,106,121,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-color: rgba(229,106,121,0.4);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(229,106,121,0.25);
+  }
+  .btn--primary:hover {
+    background: rgba(210,85,100,0.9);
+  }
+
+  /* ── Settings card: lighter glass ── */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+  }
+  .setting-card {
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.25) inset,
+      0 2px 8px rgba(0,0,0,0.03);
+  }
+  .setting-card__value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--primary);
+  }
+  .setting-card__label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(92,68,48,0.55);
+    margin-top: 4px;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(92,68,48,0.5);
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-item active">Add</div>
+    <div class="nav-item">Browse</div>
+    <div class="nav-item">Review</div>
+    <div class="nav-item">Stats</div>
+    <div class="nav-item">Settings</div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <h2 class="page-title">Browse Notes</h2>
+    <p class="page-subtitle">Your English learning collection</p>
+
+    <div class="section-label">Recently Added</div>
+
+    <!-- Frosted glass note cards -->
+    <div class="glass-card">
+      <div class="glass-card__accent"></div>
+      <div class="glass-card__body">
+        <div class="glass-card__content">serendipity</div>
+        <div class="glass-card__memo">偶然发现的美好事物 — the faculty of making happy discoveries by accident</div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="glass-card__accent"></div>
+      <div class="glass-card__body">
+        <div class="glass-card__content">ephemeral</div>
+        <div class="glass-card__memo">短暂的，转瞬即逝的 — lasting for a very short time</div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="glass-card__accent"></div>
+      <div class="glass-card__body">
+        <div class="glass-card__content">resilience</div>
+        <div class="glass-card__memo">韧性，恢复力 — the capacity to recover quickly from difficulties</div>
+      </div>
+    </div>
+
+    <!-- Review Card Demo -->
+    <div style="margin-top: 36px;">
+      <div class="section-label">Review — Card Stack</div>
+
+      <div class="review-stack">
+        <div class="review-ghost review-ghost--2"></div>
+        <div class="review-ghost review-ghost--1"></div>
+        <div class="review-active">
+          <div class="review-active__text">serendipity</div>
+          <div class="review-active__hint">Tap to reveal your note</div>
+          <div class="review-actions">
+            <button class="btn btn--outline">Don't Remember</button>
+            <button class="btn btn--primary">Remember</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards Demo -->
+    <div style="margin-top: 36px;">
+      <div class="section-label">Statistics</div>
+      <div class="settings-grid">
+        <div class="setting-card">
+          <div class="setting-card__value">42</div>
+          <div class="setting-card__label">Total Notes</div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-card__value">12</div>
+          <div class="setting-card__label">Due Today</div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-card__value">8</div>
+          <div class="setting-card__label">Mastered</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

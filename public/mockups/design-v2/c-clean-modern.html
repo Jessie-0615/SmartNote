@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design C — Clean Modern</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #ECE2D0;
+    color: #3A2E2A;
+    min-height: 100vh;
+  }
+
+  /* ── Subtle Grid Pattern ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.06;
+    background-image:
+      linear-gradient(rgba(153,46,46,0.5) 0.5px, transparent 0.5px),
+      linear-gradient(to right, rgba(153,46,46,0.5) 0.5px, transparent 0.5px);
+    background-size: 40px 40px;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 20px; }
+
+  /* ── Header ── */
+  .header {
+    padding: 24px 0 16px;
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; color: #992E2E;
+  }
+  .header span { font-size: 0.8rem; color: #8B7068; }
+
+  /* ── Note Card ── */
+  .note-card {
+    background: #FFFAF5;
+    border-radius: 6px; padding: 16px 20px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 16px;
+    animation: riseIn 0.4s ease;
+    border-left: 3px solid #99BCD7;
+  }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .note-card:nth-child(2) { border-left-color: #992E2E; }
+  .note-card .content { flex: 1; min-width: 0; }
+  .note-card .english { font-size: 1.05rem; font-weight: 600; font-family: 'DM Serif Display', serif; }
+  .note-card .chinese { font-size: 0.78rem; color: #8B7068; margin-top: 2px; }
+  .note-card .badge {
+    padding: 3px 10px; border-radius: 2px; font-size: 0.66rem; font-weight: 600;
+    background: #3A2E2A; color: #FFFAF5; white-space: nowrap;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  /* ── Review Card ── */
+  .review-card {
+    background: #FFFAF5;
+    border-radius: 8px; padding: 36px 28px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+    text-align: center; min-height: 260px;
+    display: flex; flex-direction: column; justify-content: center;
+    margin-bottom: 16px;
+    animation: riseIn 0.45s ease;
+  }
+  .review-card .word {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem; font-weight: 400; color: #3A2E2A;
+  }
+  .review-card .rule {
+    width: 40px; height: 1px; background: #992E2E; margin: 16px auto;
+  }
+  .review-card .hint { font-size: 0.75rem; color: #BFABA0; margin-top: 8px; }
+  .review-card .actions {
+    display: flex; gap: 0; margin-top: 24px;
+    border: 1px solid #E5D9C8; border-radius: 6px; overflow: hidden;
+  }
+  .review-card .actions button {
+    flex: 1; padding: 14px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline { background: #FFFAF5; color: #3A2E2A; }
+  .btn-primary { background: #3A2E2A; color: #FFFAF5; }
+  .btn-primary:hover { background: #992E2E; }
+  .btn-outline:hover { background: #F6ECEC; }
+
+  /* ── Nav ── */
+  .nav {
+    display: flex; background: #3A2E2A;
+    border-radius: 8px; padding: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    position: sticky; bottom: 20px;
+  }
+  .nav button {
+    flex: 1; padding: 12px 6px; border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 500;
+    color: #BFABA0; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.03em; text-transform: uppercase;
+  }
+  .nav button.active { background: #FFFAF5; color: #3A2E2A; }
+
+  .section-label {
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.15em; color: #BFABA0; margin: 24px 0 10px;
+    padding-left: 2px;
+  }
+
+  .accent-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: #992E2E; margin-right: 6px; vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>SmartNote</h1>
+      <span>learn at your own pace</span>
+    </div>
+  </div>
+
+  <div class="section-label"><span class="accent-dot"></span>Browse Cards</div>
+  <div class="note-card">
+    <div class="content">
+      <div class="english">serendipity</div>
+      <div class="chinese">意外发现美好事物的能力</div>
+    </div>
+    <span class="badge">Word</span>
+  </div>
+  <div class="note-card" style="animation-delay:0.06s">
+    <div class="content">
+      <div class="english">take off</div>
+      <div class="chinese">起飞；脱下</div>
+    </div>
+    <span class="badge">Phrase</span>
+  </div>
+
+  <div class="section-label"><span class="accent-dot"></span>Review Card</div>
+  <div class="review-card">
+    <div class="word">serendipity</div>
+    <div class="rule"></div>
+    <div class="hint">tap to reveal definition</div>
+    <div class="actions">
+      <button class="btn-outline">Don't Remember</button>
+      <button class="btn-primary">Remember</button>
+    </div>
+  </div>
+
+  <div style="height:20px"></div>
+  <div class="nav">
+    <button class="active">Add</button>
+    <button>Browse</button>
+    <button>Review</button>
+    <button>Stats</button>
+    <button>Settings</button>
+  </div>
+
+  <p style="text-align:center;margin-top:24px;font-size:0.7rem;color:#BFABA0">
+    Design C — Clean Modern · DM Serif + DM Sans · Grid pattern · Editorial feel
+  </p>
+</div>
+</body>
+</html>

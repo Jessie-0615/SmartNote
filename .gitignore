@@ -1,0 +1,8 @@
+node_modules/
+data/sync.db
+data/sync.db-wal
+data/sync.db-shm
+.DS_Store
+Thumbs.db
+*.log
+.env
