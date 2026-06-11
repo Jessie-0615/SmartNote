@@ -136,29 +136,70 @@ function closeWordPopup() {
 }
 
 /**
- * Attach tap-to-lookup on all English text elements matching a selector
- * Use event delegation on the container for efficiency
+ * Attach tap-to-lookup on a container. Words inside [data-lookup] elements become tappable.
+ * The handler detects which specific word was tapped (not the whole sentence).
  */
 function attachWordLookup(container) {
   if (!container) return;
-  // Remove old handler, add new via delegation
   container.removeEventListener('click', handleWordTap);
   container.addEventListener('click', handleWordTap);
 }
 
+/**
+ * Get the specific word at a point (for precise word detection)
+ */
+function getWordAtPoint(x, y) {
+  // Try modern method first
+  if (document.caretPositionFromPoint) {
+    const pos = document.caretPositionFromPoint(x, y);
+    if (pos && pos.offsetNode && pos.offsetNode.nodeType === Node.TEXT_NODE) {
+      const text = pos.offsetNode.textContent;
+      const offset = pos.offset;
+      let start = offset, end = offset;
+      while (start > 0 && /[\w'-]/.test(text[start - 1])) start--;
+      while (end < text.length && /[\w'-]/.test(text[end])) end++;
+      const word = text.slice(start, end).trim();
+      if (word.length >= 2) return word;
+    }
+  }
+  // Fallback: caretRangeFromPoint (older WebKit)
+  if (document.caretRangeFromPoint) {
+    try {
+      const range = document.caretRangeFromPoint(x, y);
+      if (range && range.startContainer && range.startContainer.nodeType === Node.TEXT_NODE) {
+        const text = range.startContainer.textContent;
+        const offset = range.startOffset;
+        let start = offset, end = offset;
+        while (start > 0 && /[\w'-]/.test(text[start - 1])) start--;
+        while (end < text.length && /[\w'-]/.test(text[end])) end++;
+        const word = text.slice(start, end).trim();
+        if (word.length >= 2) return word;
+      }
+    } catch (_) {}
+  }
+  return null;
+}
+
 async function handleWordTap(e) {
-  // Only handle clicks on English text content (not buttons, inputs, etc.)
-  const target = e.target;
-  if (target.closest('button, a, input, textarea, select, .word-popup, .expand-section__header')) return;
+  // Don't intercept clicks on interactive elements or the popup itself
+  if (e.target.closest('button, a, input, textarea, select, .word-popup, .expand-section__header, .review-mastery-btn')) return;
 
-  // Get the clicked element's text
-  const el = target.closest('[data-lookup]');
-  if (!el) return;
+  // Only activate inside lookup-enabled zones
+  const lookupZone = e.target.closest('[data-lookup]');
+  if (!lookupZone) return;
 
-  const word = el.dataset.lookup;
+  // Detect the specific word at the tap/click point
+  const word = getWordAtPoint(e.clientX, e.clientY);
   if (!word || word.length < 2) return;
 
+  // Don't look up the full sentence — only individual words
+  const fullText = lookupZone.dataset.lookup || '';
+  // If the detected word is the entire content (single word note), that's fine
+  // But if it's a multi-word sentence, ensure we got a specific word
+  if (fullText.split(/\s+/).length > 1 && word === fullText) return;
+
+  e.stopPropagation();
   closeWordPopup();
   const data = await lookupWord(word);
-  showWordPopup(word, data, el);
+  showWordPopup(word, data, lookupZone);
 }
