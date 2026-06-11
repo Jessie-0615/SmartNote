@@ -100,13 +100,31 @@ async function renderSettings(container) {
     </div>
 
     <!-- About -->
-    <div class="card">
+    <div class="card mb-md">
       <h3 style="font-size:var(--font-size-md)">About EngNotes</h3>
       <p class="text-secondary" style="font-size:var(--font-size-sm)">
         English Learning Note & Review App v1.0<br>
         AI-powered categorization · Spaced repetition (SM-2) · PWA<br>
         Data stored locally in your browser. Nothing is sent to any server except AI API calls for categorization and expansion.
       </p>
+    </div>
+
+    <!-- Version History -->
+    <div class="card">
+      <div class="flex-between">
+        <h3 style="font-size:var(--font-size-md)">Version History</h3>
+        <span id="gitStatusDot" style="width:10px;height:10px;border-radius:50%;background:var(--text-tertiary);display:inline-block;flex-shrink:0" title="Backend status"></span>
+      </div>
+      <p class="text-secondary" style="font-size:var(--font-size-sm)">
+        Save checkpoints of your project and restore to previous versions if needed.
+      </p>
+      <div class="flex gap-sm mt-md" style="flex-wrap:wrap">
+        <button class="btn btn--primary btn--sm" id="saveCheckpointBtn">Save Checkpoint</button>
+        <button class="btn btn--ghost btn--sm" id="refreshCheckpointsBtn">Refresh</button>
+      </div>
+      <div id="checkpointList" class="mt-md">
+        <p class="text-secondary" style="font-size:var(--font-size-sm)">Loading...</p>
+      </div>
     </div>
   `;
 
@@ -118,6 +136,9 @@ async function renderSettings(container) {
 
   // --- Sync UI ---
   renderSyncUI();
+
+  // --- Version History ---
+  initVersionHistory();
 
   // --- API Key Management ---
   const apiKeyInput = document.getElementById('apiKeyInput');
@@ -627,4 +648,113 @@ function renderStylePicker() {
       opt.classList.add('selected');
     });
   });
+}
+
+// ---------------------------------------------------------------------------
+// Version History (git checkpoints)
+// ---------------------------------------------------------------------------
+
+async function loadCheckpoints() {
+  const list = document.getElementById('checkpointList');
+  const dot = document.getElementById('gitStatusDot');
+  if (!list) return;
+
+  try {
+    const res = await fetch('/api/git/checkpoints');
+    if (!res.ok) throw new Error('Failed');
+    const data = await res.json();
+    const checkpoints = data.checkpoints || [];
+
+    if (dot) {
+      dot.style.background = 'var(--success)';
+      dot.title = 'Backend connected';
+    }
+
+    if (!checkpoints.length) {
+      list.innerHTML = '<p class="text-secondary" style="font-size:var(--font-size-sm)">No checkpoints yet.</p>';
+      return;
+    }
+
+    list.innerHTML = checkpoints.map((cp, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-sm);${i > 0 ? 'margin-top:6px' : ''}">
+        <div style="min-width:0;flex:1">
+          <div style="font-size:var(--font-size-sm);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(cp.message)}</div>
+          <div style="font-size:var(--font-size-xs);color:var(--text-tertiary)">
+            <code style="font-size:0.65rem;color:var(--text-tertiary);user-select:all">${cp.hash.slice(0, 7)}</code>
+            · ${cp.date ? new Date(cp.date).toLocaleString() : ''}
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--sm restore-btn" data-hash="${cp.hash}" data-msg="${escapeHtml(cp.message)}" style="color:var(--danger);flex-shrink:0;margin-left:var(--space-sm)" ${i === 0 ? 'disabled title="Already at latest"' : ''}>Restore</button>
+      </div>
+    `).join('');
+
+    // Wire restore buttons
+    list.querySelectorAll('.restore-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const hash = btn.dataset.hash;
+        const msg = btn.dataset.msg;
+        const confirmed = await confirmDialog(
+          'Restore Version',
+          `Restore project files to "${msg}" (${hash.slice(0, 7)})? Current uncommitted changes will be lost.`,
+          'Restore',
+          true
+        );
+        if (!confirmed) return;
+
+        try {
+          const res = await fetch('/api/git/restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hash }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(err.error);
+          }
+          showToast('Restored! Hard refresh to see changes.', 'success');
+          loadCheckpoints();
+        } catch (err) {
+          showToast('Restore failed: ' + err.message, 'error');
+        }
+      });
+    });
+  } catch (err) {
+    if (dot) {
+      dot.style.background = 'var(--danger)';
+      dot.title = 'Backend unavailable';
+    }
+    list.innerHTML = '<p class="text-secondary" style="font-size:var(--font-size-sm);color:var(--danger)">Cannot reach server. Make sure the app is running.</p>';
+  }
+}
+
+// Wire up version history buttons (called from renderSettings after DOM is ready)
+function initVersionHistory() {
+  document.getElementById('saveCheckpointBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('saveCheckpointBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    try {
+      const res = await fetch('/api/git/checkpoint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Checkpoint from Settings' }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error);
+      }
+      const data = await res.json();
+      showToast('Checkpoint saved!', 'success');
+      loadCheckpoints();
+    } catch (err) {
+      showToast('Save failed: ' + err.message, 'error');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Save Checkpoint';
+  });
+
+  document.getElementById('refreshCheckpointsBtn')?.addEventListener('click', loadCheckpoints);
+
+  // Initial load
+  loadCheckpoints();
 }

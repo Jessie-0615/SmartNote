@@ -450,6 +450,78 @@ async function handleSyncRoutes(req, res, pathname, ip) {
 }
 
 // ---------------------------------------------------------------------------
+// /api/git/* — version checkpoint management (local only)
+// ---------------------------------------------------------------------------
+const { execSync } = require('child_process');
+
+function gitExec(args) {
+  try {
+    return execSync('git ' + args, {
+      cwd: __dirname,
+      encoding: 'utf-8',
+      timeout: 10_000,
+    }).trim();
+  } catch (err) {
+    throw new Error(err.stderr || err.message || 'Git command failed');
+  }
+}
+
+async function handleGitRoutes(req, res, pathname) {
+  try {
+    // GET /api/git/checkpoints — list recent commits
+    if (pathname === '/api/git/checkpoints' && req.method === 'GET') {
+      const log = gitExec('log --oneline -30 --format="%H|%s|%ai"');
+      const checkpoints = log ? log.split('\n').map(line => {
+        const [hash, ...rest] = line.split('|');
+        const msg = rest.slice(0, -1).join('|');
+        const date = rest[rest.length - 1];
+        return { hash, message: msg, date };
+      }) : [];
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ checkpoints }));
+      return;
+    }
+
+    // POST /api/git/checkpoint — create a new commit
+    if (pathname === '/api/git/checkpoint' && req.method === 'POST') {
+      const { message } = await readBody(req);
+      const msg = message || 'Checkpoint ' + new Date().toISOString().slice(0, 16).replace('T', ' ');
+      gitExec('add -A');
+      gitExec('commit -m "' + msg.replace(/"/g, '\\"') + '"');
+      const log = gitExec('log -1 --format="%H|%s|%ai"');
+      const [hash, ...rest] = log.split('|');
+      const cmtMsg = rest.slice(0, -1).join('|');
+      const date = rest[rest.length - 1];
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ checkpoint: { hash, message: cmtMsg, date } }));
+      return;
+    }
+
+    // POST /api/git/restore — restore files to a specific commit
+    if (pathname === '/api/git/restore' && req.method === 'POST') {
+      const { hash } = await readBody(req);
+      if (!hash) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Commit hash required' }));
+        return;
+      }
+      gitExec('checkout ' + hash + ' -- .');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ restored: true, hash }));
+      return;
+    }
+
+    // Not matched
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+  } catch (err) {
+    console.error('Git error:', err.message);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message || 'Git operation failed' }));
+  }
+}
+
+// ---------------------------------------------------------------------------
 // HTTP Server
 // ---------------------------------------------------------------------------
 const server = http.createServer(async (req, res) => {
@@ -466,6 +538,12 @@ const server = http.createServer(async (req, res) => {
 
   const parsed = new URL(req.url, 'http://localhost');
   const pathname = parsed.pathname;
+
+  // Git version routes: local management, no API key needed
+  if (pathname.startsWith('/api/git/')) {
+    await handleGitRoutes(req, res, pathname);
+    return;
+  }
 
   // Sync routes: handle first (different rate limit, no API key needed)
   if (pathname.startsWith('/api/sync/')) {
