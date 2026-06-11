@@ -14,7 +14,8 @@
     "pwa"
   ],
   "license": "MIT",
-  "dependencies": {
+  "dependencies": {},
+  "optionalDependencies": {
     "better-sqlite3": "^12.10.0"
   }
 }
