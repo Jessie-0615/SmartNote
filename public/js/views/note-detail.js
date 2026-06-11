@@ -43,9 +43,9 @@ async function renderNoteDetail(noteId) {
   if (note.aiExpanded) {
     // Helper: render example items (supports both string and {en, zh} formats)
     const renderExample = (ex) => {
-      if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm);font-style:italic">${escapeHtml(ex)}</li>`;
+      if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm)">${escapeHtml(ex)}</li>`;
       return `<li style="margin-bottom:var(--space-sm)">
-        <div style="font-style:italic;color:var(--text)">${escapeHtml(ex.en)}</div>
+        <div style="font-weight:700;color:var(--primary)">${escapeHtml(ex.en)}</div>
         ${ex.zh ? `<div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:2px">${escapeHtml(ex.zh)}</div>` : ''}
       </li>`;
     };
@@ -58,8 +58,8 @@ async function renderNoteDetail(noteId) {
 
     expansionHtml = `
       <div class="card mt-md" style="border-left:4px solid var(--primary)">
-        <h3 style="margin-bottom:var(--space-md);display:flex;align-items:center;gap:var(--space-sm)">
-          <span style="font-size:1.1rem">✦</span> AI Expansion
+        <h3 style="margin-bottom:var(--space-md);display:flex;align-items:center;justify-content:space-between">
+          AI Expansion <span style="font-size:1.1rem">✦</span>
         </h3>
 
         ${note.aiChineseTranslation ? `
@@ -70,15 +70,15 @@ async function renderNoteDetail(noteId) {
         ` : ''}
 
         ${note.aiDefinition ? `
-          <div class="expand-section open">
-            <div class="expand-section__header"><span class="expand-arrow">▾</span> 中文释义 · Definition (CN)</div>
+          <div class="expand-section">
+            <div class="expand-section__header"><span class="expand-arrow">▸</span> 中文释义 · Definition (CN)</div>
             <div class="expand-section__body"><p style="font-size:var(--font-size-md);line-height:1.8">${escapeHtml(note.aiDefinition)}</p></div>
           </div>
         ` : ''}
 
         ${note.aiDefinitionEn ? `
-          <div class="expand-section">
-            <div class="expand-section__header"><span class="expand-arrow">▸</span> English Definition</div>
+          <div class="expand-section open">
+            <div class="expand-section__header"><span class="expand-arrow">▾</span> English Definition</div>
             <div class="expand-section__body"><p style="color:var(--text-secondary)">${escapeHtml(note.aiDefinitionEn)}</p></div>
           </div>
         ` : ''}
