@@ -544,18 +544,18 @@ async function renderSyncUI() {
 // Theme Switcher
 // ---------------------------------------------------------------------------
 const THEMES = [
-  { id: 'scheme-1', name: 'Warm Peach', colors: ['#FFF5EE','#F7BE98','#E56A79','#262626'] },
+  { id: 'scheme-6', name: 'Vintage Paper', colors: ['#ECE2D0','#FFFAF5','#992E2E','#99BCD7'] },
+  { id: 'scheme-5', name: 'Dark Mode', colors: ['#343540','#EED0AE','#788F74','#F0F0F0'] },
   { id: 'scheme-2', name: 'Mint Fresh', colors: ['#F0F7F4','#CEE7E1','#4A9E7E','#F0686C'] },
   { id: 'scheme-3', name: 'Soft Butter', colors: ['#FDF8EC','#EFE695','#E586AA','#404040'] },
   { id: 'scheme-4', name: 'Dusty Rose', colors: ['#F5EFEC','#E3BCB5','#B98A82','#A7BEC6'] },
-  { id: 'scheme-5', name: 'Dark Mode', colors: ['#343540','#EED0AE','#788F74','#F0F0F0'] },
-  { id: 'scheme-6', name: 'Vintage Paper', colors: ['#ECE2D0','#FFFAF5','#992E2E','#99BCD7'] },
   { id: 'scheme-7', name: 'Sky Blue', colors: ['#D8E0DF','#F2F9FB','#5BA8C8','#A0D5EA'] },
   { id: 'scheme-8', name: 'Lavender', colors: ['#C4CFDD','#F2F5FA','#9B68D8','#71C3B0'] },
   { id: 'scheme-9', name: 'Hot Pink Teal', colors: ['#CEE6EE','#F7FCFD','#F55477','#1A4A40'] },
-  { id: 'scheme-10', name: 'Raspberry', colors: ['#3B403A','#494D47','#E02A60','#F8A8AA'] },
+  { id: 'scheme-10', name: 'Raspberry', colors: ['#E02A60','#F8A8AA','#3B403A','#494D47'] },
   { id: 'scheme-11', name: 'Terra', colors: ['#EED3B3','#FDF7F2','#C24B4C','#698127'] },
   { id: 'scheme-12', name: 'Pop', colors: ['#FFFFFF','#08BAE2','#E8B800','#FFCA06'] },
+  { id: 'scheme-1', name: 'Warm Peach', colors: ['#FFF5EE','#F7BE98','#E56A79','#262626'] },
 ];
 
 function getCurrentTheme() {
@@ -612,8 +612,8 @@ function renderThemePicker() {
 // ---------------------------------------------------------------------------
 const STYLES = [
   { id: 'original', name: 'Original', hint: 'Clean modern with grid pattern', preview: 'style-preview--original' },
-  { id: 'editorial', name: 'Editorial', hint: 'Linen paper & print typography', preview: 'style-preview--editorial' },
   { id: 'soft-depth', name: 'Soft Depth', hint: 'Neumorphic shadows & noise texture', preview: 'style-preview--soft-depth' },
+  { id: 'editorial', name: 'Editorial', hint: 'Linen paper & print typography', preview: 'style-preview--editorial' },
   { id: 'tag', name: 'Tag Aesthetic', hint: 'Cork board & physical tag cards', preview: 'style-preview--tag' },
   { id: 'glass', name: 'Frosted Glass', hint: 'Acrylic blur & translucent surfaces', preview: 'style-preview--glass' },
 ];
