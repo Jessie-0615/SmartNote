@@ -31,7 +31,7 @@ function renderNoteEditor(container) {
         <textarea
           id="noteMemo"
           class="form-textarea"
-          placeholder="Optional: Add context — where you heard it, what it means to you..."
+          placeholder="Anything else you think is worth noting down..."
           rows="2"
         ></textarea>
       </div>

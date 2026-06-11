@@ -31,16 +31,17 @@ function renderBrowse(container) {
         <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="review">Next review</option>
       </select>
     </div>
-    <div id="noteList"><div class="empty-state"><div class="icon">Browse</div><h3>No notes yet</h3><p>Start by adding your first English entry!</p></div></div>
-    <div id="selectBar" style="display:none;position:sticky;bottom:0;background:var(--card-bg);backdrop-filter:var(--card-blur);-webkit-backdrop-filter:var(--card-blur);border-top:1px solid var(--border);padding:var(--space-md);margin:var(--space-md) calc(-1*var(--space-md)) calc(-1*var(--space-md)) calc(-1*var(--space-md));z-index:50">
-      <div class="flex-between">
+    <div id="selectBar" style="display:none;background:var(--primary-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-md);margin-bottom:var(--space-md);z-index:50">
+      <div class="flex-between" style="flex-wrap:wrap;gap:var(--space-sm)">
         <span id="selectCount" style="font-weight:600;font-size:var(--font-size-sm)"></span>
-        <div style="display:flex;gap:var(--space-sm)">
+        <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap">
+          <button class="btn btn--ghost btn--sm" id="selectUnexpandedBtn">Select All Unexpanded</button>
           <button class="btn btn--primary btn--sm" id="batchExpandBtn">Expand Selected</button>
           <button class="btn btn--ghost btn--sm" id="cancelSelectBtn">Cancel</button>
         </div>
       </div>
     </div>
+    <div id="noteList"><div class="empty-state"><div class="icon">Browse</div><h3>No notes yet</h3><p>Start by adding your first English entry!</p></div></div>
   `;
 
   let currentCat='all', currentSearch='', currentSort='newest', currentMode=savedMode;
@@ -130,6 +131,21 @@ function renderBrowse(container) {
     });
     updateSelectBar();
   }
+
+  // Select all unexpanded
+  document.getElementById('selectUnexpandedBtn')?.addEventListener('click', async () => {
+    const notes = await getAllNotes();
+    if (currentCat==='favorites') notes = notes.filter(n => n.favorited);
+    else if (currentCat!=='all') notes = notes.filter(n => n.category===currentCat);
+    const unexpanded = notes.filter(n => !n.aiExpanded);
+    if (!unexpanded.length) {
+      showToast('All notes are already expanded!', 'success');
+      return;
+    }
+    unexpanded.forEach(n => selectedIds.add(n.id));
+    showToast(`${unexpanded.length} unexpanded note${unexpanded.length!==1?'s':''} selected`, 'success');
+    refreshList();
+  });
 
   // Batch expand handler
   document.getElementById('batchExpandBtn')?.addEventListener('click', async () => {
