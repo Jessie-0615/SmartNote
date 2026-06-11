@@ -5,150 +5,196 @@
    --------------------------------------------------------------------------- */
 
 /* ============================================================
-   SOFT DEPTH — Neumorphic shadows + noise texture (D)
+   SOFT DEPTH — Deep neumorphism with pronounced 3D feel
    ============================================================ */
+[data-style="soft-depth"] body {
+  /* Subtle radial gradient for depth perception */
+  background: radial-gradient(ellipse at 50% 0%, var(--primary-bg) 0%, var(--bg) 60%);
+  background-attachment: fixed;
+}
 [data-style="soft-depth"] body::after {
-  /* Replace grid with fine noise texture */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  opacity: 0.5;
+  /* Fine noise texture */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  opacity: 0.55;
   background-size: auto;
 }
 
+/* ── Cards: strong convex neumorphic surface ── */
 [data-style="soft-depth"] .card,
 [data-style="soft-depth"] .note-card,
 [data-style="soft-depth"] .stat-card,
 [data-style="soft-depth"] .chart-container,
 [data-style="soft-depth"] .review-empty,
-[data-style="soft-depth"] .setting-card,
-[data-style="soft-depth"] .theme-option,
 [data-style="soft-depth"] .memo-box {
   background: var(--bg);
   border: none;
   box-shadow:
-    4px 4px 8px rgba(0,0,0,0.06),
-    -4px -4px 8px rgba(255,255,255,0.7);
-  border-radius: 10px;
+    6px 6px 14px rgba(0,0,0,0.08),
+    -6px -6px 14px rgba(255,255,255,0.75),
+    0 0 0 1px rgba(255,255,255,0.15);
+  border-radius: 14px;
 }
 
 [data-style="soft-depth"] .note-card {
   border-left: none;
   box-shadow:
-    4px 4px 8px rgba(0,0,0,0.06),
-    -4px -4px 8px rgba(255,255,255,0.7);
+    5px 5px 12px rgba(0,0,0,0.07),
+    -5px -5px 12px rgba(255,255,255,0.72);
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 [data-style="soft-depth"] .note-card:hover {
   box-shadow:
-    6px 6px 14px rgba(0,0,0,0.08),
-    -6px -6px 14px rgba(255,255,255,0.75);
-  transform: translateY(-1px);
+    8px 8px 20px rgba(0,0,0,0.1),
+    -8px -8px 20px rgba(255,255,255,0.8);
+  transform: translateY(-3px);
+}
+[data-style="soft-depth"] .note-card:active {
+  box-shadow:
+    inset 3px 3px 8px rgba(0,0,0,0.08),
+    inset -3px -3px 8px rgba(255,255,255,0.55);
+  transform: translateY(0);
 }
 
+/* ── Buttons: pronounced convex with deep press ── */
 [data-style="soft-depth"] .btn--primary {
   box-shadow:
-    3px 3px 6px rgba(0,0,0,0.1),
-    -1px -1px 4px rgba(255,255,255,0.3);
+    4px 4px 10px rgba(0,0,0,0.12),
+    -2px -2px 6px rgba(255,255,255,0.35),
+    0 0 0 1px rgba(255,255,255,0.1);
   border: none;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+[data-style="soft-depth"] .btn--primary:hover {
+  box-shadow:
+    6px 6px 14px rgba(0,0,0,0.14),
+    -3px -3px 8px rgba(255,255,255,0.4);
+  transform: translateY(-2px);
 }
 [data-style="soft-depth"] .btn--primary:active {
   box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.15),
-    inset -1px -1px 3px rgba(255,255,255,0.1);
-  transform: scale(0.97);
+    inset 4px 4px 10px rgba(0,0,0,0.18),
+    inset -2px -2px 6px rgba(255,255,255,0.08);
+  transform: scale(0.96);
 }
 [data-style="soft-depth"] .btn--outline {
   background: var(--bg);
   border: none;
   color: var(--text-secondary);
   box-shadow:
-    3px 3px 6px rgba(0,0,0,0.05),
-    -3px -3px 6px rgba(255,255,255,0.6);
+    4px 4px 10px rgba(0,0,0,0.07),
+    -4px -4px 10px rgba(255,255,255,0.65);
+  border-radius: 10px;
+}
+[data-style="soft-depth"] .btn--outline:hover {
+  box-shadow:
+    5px 5px 12px rgba(0,0,0,0.09),
+    -5px -5px 12px rgba(255,255,255,0.7);
 }
 [data-style="soft-depth"] .btn--outline:active {
   box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.08),
-    inset -2px -2px 5px rgba(255,255,255,0.3);
+    inset 3px 3px 8px rgba(0,0,0,0.1),
+    inset -3px -3px 8px rgba(255,255,255,0.35);
 }
 
+/* ── Review card: deep floating surface ── */
 [data-style="soft-depth"] .review-card--active {
   background: var(--bg);
   border: none;
   box-shadow:
-    6px 6px 16px rgba(0,0,0,0.08),
-    -6px -6px 16px rgba(255,255,255,0.75);
-  border-radius: 12px;
+    8px 8px 22px rgba(0,0,0,0.1),
+    -8px -8px 22px rgba(255,255,255,0.78),
+    0 0 0 1px rgba(255,255,255,0.2);
+  border-radius: 16px;
 }
 [data-style="soft-depth"] .review-card--ghost {
   background: var(--bg);
   border: none;
   box-shadow:
-    4px 4px 10px rgba(0,0,0,0.05),
-    -4px -4px 10px rgba(255,255,255,0.55);
+    5px 5px 14px rgba(0,0,0,0.06),
+    -5px -5px 14px rgba(255,255,255,0.6);
+  border-radius: 14px;
 }
 
+/* ── Inputs: deeply recessed ── */
 [data-style="soft-depth"] .form-input,
-[data-style="soft-depth"] .form-textarea {
+[data-style="soft-depth"] .form-textarea,
+[data-style="soft-depth"] .search-input input {
   background: var(--bg);
   border: none;
+  border-radius: 10px;
   box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.06),
-    inset -2px -2px 5px rgba(255,255,255,0.5);
+    inset 4px 4px 10px rgba(0,0,0,0.08),
+    inset -3px -3px 8px rgba(255,255,255,0.55);
 }
 [data-style="soft-depth"] .form-input:focus,
 [data-style="soft-depth"] .form-textarea:focus {
   box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.08),
-    inset -2px -2px 5px rgba(255,255,255,0.6),
-    0 0 0 2px var(--primary-bg);
+    inset 4px 4px 10px rgba(0,0,0,0.1),
+    inset -3px -3px 8px rgba(255,255,255,0.6),
+    0 0 0 3px var(--primary-bg);
 }
 
-[data-style="soft-depth"] .search-input input {
-  background: var(--bg);
-  border: none;
-  box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.06),
-    inset -2px -2px 5px rgba(255,255,255,0.5);
-}
-
+/* ── Modal: elevated surface ── */
 [data-style="soft-depth"] .modal {
   border-top: none;
+  border-radius: 16px;
   box-shadow:
-    8px 8px 24px rgba(0,0,0,0.12),
-    -4px -4px 16px rgba(255,255,255,0.6);
+    12px 12px 30px rgba(0,0,0,0.14),
+    -8px -8px 22px rgba(255,255,255,0.65);
 }
 
+/* ── Progress bar: recessed track ── */
 [data-style="soft-depth"] .progress-bar {
   background: var(--bg);
+  border-radius: 10px;
   box-shadow:
-    inset 2px 2px 4px rgba(0,0,0,0.06),
-    inset -2px -2px 4px rgba(255,255,255,0.4);
+    inset 3px 3px 6px rgba(0,0,0,0.08),
+    inset -2px -2px 5px rgba(255,255,255,0.45);
 }
 
+/* ── Pills: convex, pressed when active ── */
 [data-style="soft-depth"] .pill {
   background: var(--bg);
   border: none;
+  border-radius: 8px;
   box-shadow:
-    2px 2px 4px rgba(0,0,0,0.04),
-    -2px -2px 4px rgba(255,255,255,0.5);
+    3px 3px 6px rgba(0,0,0,0.05),
+    -3px -3px 6px rgba(255,255,255,0.55);
 }
 [data-style="soft-depth"] .pill.active {
   background: var(--text);
   color: var(--bg);
   box-shadow:
-    inset 2px 2px 4px rgba(0,0,0,0.15),
-    inset -1px -1px 3px rgba(255,255,255,0.05);
+    inset 3px 3px 7px rgba(0,0,0,0.2),
+    inset -2px -2px 5px rgba(255,255,255,0.06);
 }
 
+/* ── Sidebar: subtle inner shadow ── */
 [data-style="soft-depth"] .bottom-nav {
   box-shadow:
-    inset -1px 0 0 rgba(255,255,255,0.4),
-    2px 0 8px rgba(0,0,0,0.04);
+    inset -2px 0 4px rgba(255,255,255,0.35),
+    3px 0 12px rgba(0,0,0,0.05);
+}
+[data-style="soft-depth"] .bottom-nav__item {
+  border-radius: 8px;
+  margin: 1px 8px;
 }
 
 [data-style="soft-depth"] .review-card__actions {
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Mobile neumorphic cards */
+/* ── Stat cards with pronounced float ── */
+[data-style="soft-depth"] .stat-card {
+  box-shadow:
+    6px 6px 14px rgba(0,0,0,0.07),
+    -6px -6px 14px rgba(255,255,255,0.72);
+  border-radius: 14px;
+}
+
+/* Mobile */
 @media (max-width: 767px) {
   [data-style="soft-depth"] .note-card {
     background: var(--bg);
@@ -156,25 +202,29 @@
   }
   [data-style="soft-depth"] .bottom-nav {
     box-shadow:
-      inset 0 -1px 0 rgba(255,255,255,0.3),
-      0 2px 8px rgba(0,0,0,0.04);
+      inset 0 -1px 0 rgba(255,255,255,0.25),
+      0 3px 12px rgba(0,0,0,0.05);
+  }
+  [data-style="soft-depth"] .bottom-nav__item {
+    margin: 1px 4px;
   }
 }
 
 
 /* ============================================================
-   TAG AESTHETIC — Cork texture + physical tag shapes (B)
-   Uses theme colors; cork grain overlays theme background
+   TAG AESTHETIC — Sticky notes on cork board
+   Binding rings, varied rotations, tape strips, colorful tints
    ============================================================ */
 [data-style="tag"] body {
   background-color: var(--bg);
 }
 [data-style="tag"] body::after {
-  /* Cork grain texture overlay on top of theme bg */
+  /* Cork grain texture */
   background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
   opacity: 0.6;
 }
 
+/* ── Cards: sticky note feel with colorful tints ── */
 [data-style="tag"] .card,
 [data-style="tag"] .note-card,
 [data-style="tag"] .stat-card,
@@ -183,42 +233,103 @@
 [data-style="tag"] .memo-box {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 4px 14px 4px 14px;
-  box-shadow: var(--shadow-sm);
+  border-radius: 2px 12px 2px 12px;
+  box-shadow:
+    1px 2px 4px rgba(0,0,0,0.06),
+    3px 6px 14px rgba(0,0,0,0.04);
 }
 
+/* Each note card gets a slightly different tint and rotation */
 [data-style="tag"] .note-card {
-  border-left: 2px solid var(--primary);
-  transform: rotate(-0.25deg);
+  border-left: 3px solid var(--primary);
+  transform: rotate(-0.5deg);
+  position: relative;
+  transition: all 0.25s ease;
 }
-[data-style="tag"] .note-card:nth-child(even) { transform: rotate(0.3deg); }
-[data-style="tag"] .note-card:nth-child(3n) { transform: rotate(-0.15deg); }
+[data-style="tag"] .note-card:nth-child(2n) {
+  transform: rotate(0.6deg);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--primary-bg) 100%);
+}
+[data-style="tag"] .note-card:nth-child(3n) {
+  transform: rotate(-0.35deg);
+  background: linear-gradient(135deg, var(--accent-bg) 0%, var(--surface) 100%);
+}
+[data-style="tag"] .note-card:nth-child(4n) {
+  transform: rotate(0.25deg);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--primary-bg) 100%);
+}
+[data-style="tag"] .note-card:nth-child(5n) {
+  transform: rotate(-0.55deg);
+  background: linear-gradient(225deg, var(--surface) 0%, var(--accent-bg) 100%);
+}
 [data-style="tag"] .note-card:hover {
-  transform: rotate(0) translateY(-2px) !important;
-  box-shadow: var(--shadow-md);
-  z-index: 2;
+  transform: rotate(0) translateY(-3px) !important;
+  box-shadow:
+    2px 4px 8px rgba(0,0,0,0.08),
+    5px 10px 24px rgba(0,0,0,0.06);
+  z-index: 3;
 }
 
-/* Tag hole */
-[data-style="tag"] .note-card::after {
+/* ── Binding rings at top of cards ── */
+[data-style="tag"] .note-card::before {
   content: '';
   position: absolute;
-  top: 10px; right: 14px;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+  top: 6px; left: 16px; right: 16px;
+  height: 10px;
+  background:
+    radial-gradient(circle 4px, var(--border) 40%, transparent 45%) repeat-x 0 0 / 16px 10px;
   opacity: 0.5;
   pointer-events: none;
 }
+[data-style="tag"] .note-card {
+  padding-top: 20px; /* extra space for rings */
+}
 
+/* Single punched hole (larger, right side) */
+[data-style="tag"] .note-card::after {
+  content: '';
+  position: absolute;
+  top: 8px; right: 12px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  box-shadow:
+    inset 0 1px 3px rgba(0,0,0,0.1),
+    0 1px 0 rgba(255,255,255,0.5);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ── Tape strip on some cards ── */
+[data-style="tag"] .note-card:nth-child(3n) {
+  position: relative;
+}
+[data-style="tag"] .note-card:nth-child(3n) .note-card__body::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 42px; height: 14px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 1px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  z-index: 2;
+}
+
+/* ── Sidebar: cork-backed ── */
 [data-style="tag"] .bottom-nav {
   background: var(--nav-bg);
   border-right: 1px solid var(--border);
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
 }
 [data-style="tag"] .bottom-nav::before { color: var(--primary); }
-[data-style="tag"] .bottom-nav__item { color: var(--nav-text); }
+[data-style="tag"] .bottom-nav__item {
+  color: var(--nav-text);
+  border-radius: 2px 8px 2px 8px;
+  margin: 1px 10px;
+}
 [data-style="tag"] .bottom-nav__item:hover { color: var(--nav-text-hover); background: var(--nav-active-bg); }
 [data-style="tag"] .bottom-nav__item.active {
   color: var(--nav-text-active);
@@ -226,15 +337,29 @@
   border-right-color: var(--nav-active-border);
 }
 
+/* ── Review card: big sticky note ── */
 [data-style="tag"] .review-card--active {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px 18px 6px 18px;
-  box-shadow: var(--shadow-md);
+  border-radius: 3px 16px 3px 16px;
+  box-shadow:
+    2px 3px 6px rgba(0,0,0,0.06),
+    6px 10px 28px rgba(0,0,0,0.06);
+}
+[data-style="tag"] .review-card--active::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 20px; right: 20px;
+  height: 12px;
+  background:
+    radial-gradient(circle 5px, var(--border) 38%, transparent 42%) repeat-x 0 0 / 20px 12px;
+  opacity: 0.45;
+  pointer-events: none;
 }
 [data-style="tag"] .review-card--ghost {
   background: var(--surface);
   border: 1px solid var(--border);
+  border-radius: 3px 16px 3px 16px;
 }
 
 [data-style="tag"] .review-card__actions {
@@ -244,26 +369,37 @@
   border: 1px dashed var(--border);
   color: var(--text-secondary);
   background: transparent;
+  border-radius: 3px 8px 3px 8px;
 }
 [data-style="tag"] .btn--outline:hover {
   background: var(--primary-bg);
 }
 
+/* ── Pills & badges: tag-shaped ── */
 [data-style="tag"] .pill {
   border-radius: 3px 8px 3px 8px;
 }
-
 [data-style="tag"] .badge {
   border-radius: 3px 7px 3px 7px;
 }
 
-/* Mobile tag */
+/* ── Stats cards ── */
+[data-style="tag"] .stat-card {
+  border-radius: 2px 14px 2px 14px;
+  background: var(--surface);
+}
+
+/* Mobile */
 @media (max-width: 767px) {
   [data-style="tag"] .bottom-nav {
     background: var(--nav-bg);
     border-bottom: 1px solid var(--border);
     border-right: none;
     box-shadow: none;
+  }
+  [data-style="tag"] .bottom-nav__item {
+    margin: 0;
+    border-radius: 0;
   }
   [data-style="tag"] .bottom-nav__item.active {
     border-right: none !important;
@@ -428,34 +564,45 @@
 
 
 /* ============================================================
-   FROSTED GLASS — Strong glassmorphism with glow orbs (A)
-   Reduced transparency from mockup for stronger effect
+   FROSTED GLASS — Theme-matched gradients + acrylic blur
+   Cards tinted with current theme's primary/accent colors
    ============================================================ */
 [data-style="glass"] body::after {
   background-image: none;
   opacity: 0;
 }
 [data-style="glass"] body {
-  /* Ambient glow orbs */
   position: relative;
+}
+
+/* ── Theme-colored ambient glow orbs ── */
+[data-style="glass"] body::before {
+  content: '';
+  position: fixed;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary-bg) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none; z-index: 0;
+  opacity: 0.5;
+}
+/* Second glow orb bottom-left using accent */
+[data-style="glass"] #app::before {
+  content: '';
+  position: fixed;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-bg) 0%, transparent 70%);
+  bottom: -80px; left: -80px;
+  pointer-events: none; z-index: 0;
+  opacity: 0.4;
 }
 [data-style="glass"] #app {
   position: relative;
   z-index: 1;
 }
 
-/* Glow orb top-right */
-[data-style="glass"] body::before {
-  content: '';
-  position: fixed;
-  width: 350px; height: 350px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--primary-rgb, 229,106,121), 0.18) 0%, transparent 70%);
-  top: -80px; right: -80px;
-  pointer-events: none; z-index: 0;
-}
-
-/* Sidebar: dark frosted glass */
+/* ── Sidebar: dark frosted glass ── */
 [data-style="glass"] .bottom-nav {
   background: rgba(30,28,38,0.72);
   backdrop-filter: blur(20px) saturate(140%);
@@ -465,6 +612,8 @@
 [data-style="glass"] .bottom-nav::before { color: rgba(255,255,255,0.9); }
 [data-style="glass"] .bottom-nav__item {
   color: rgba(255,255,255,0.5);
+  border-radius: 8px;
+  margin: 1px 8px;
 }
 [data-style="glass"] .bottom-nav__item:hover {
   color: rgba(255,255,255,0.78);
@@ -476,69 +625,106 @@
   border-right-color: rgba(255,255,255,0.45);
 }
 
-/* Cards: strong glass */
+/* ── Cards: frosted glass with theme gradient tint ── */
 [data-style="glass"] .card,
 [data-style="glass"] .note-card,
 [data-style="glass"] .stat-card,
 [data-style="glass"] .chart-container,
 [data-style="glass"] .review-empty,
 [data-style="glass"] .memo-box {
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  border: 1px solid rgba(255,255,255,0.45);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.2) inset,
-    0 2px 8px rgba(0,0,0,0.04),
-    0 8px 28px rgba(0,0,0,0.05);
-  border-radius: 10px;
-}
-[data-style="glass"] .note-card {
-  border-left: 3px solid var(--primary);
-}
-[data-style="glass"] .note-card:hover {
-  background: rgba(255,255,255,0.65);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.3) inset,
-    0 4px 16px rgba(0,0,0,0.06),
-    0 12px 36px rgba(0,0,0,0.06);
-  transform: translateY(-1px);
-}
-
-/* Review card: thicker glass */
-[data-style="glass"] .review-card--active {
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(20px) saturate(130%);
-  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.55) 0%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,255,255,0.55) 100%
+  );
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
   border: 1px solid rgba(255,255,255,0.5);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.3) inset,
-    0 4px 20px rgba(0,0,0,0.06),
-    0 12px 40px rgba(0,0,0,0.06);
-  border-radius: 10px;
-}
-[data-style="glass"] .review-card--ghost {
-  background: rgba(255,255,255,0.35);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
+    0 1px 0 rgba(255,255,255,0.25) inset,
+    0 2px 10px rgba(0,0,0,0.04),
+    0 8px 32px rgba(0,0,0,0.06);
+  border-radius: 12px;
 }
 
-/* Glass buttons */
+/* Note cards: primary-color gradient tint */
+[data-style="glass"] .note-card {
+  border-left: 3px solid var(--primary);
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.6) 0%,
+    rgba(255,255,255,0.48) 40%,
+    var(--primary-bg) 100%
+  );
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  transition: all 0.3s ease;
+}
+[data-style="glass"] .note-card:nth-child(even) {
+  background: linear-gradient(
+    225deg,
+    rgba(255,255,255,0.6) 0%,
+    rgba(255,255,255,0.48) 40%,
+    var(--accent-bg) 100%
+  );
+}
+[data-style="glass"] .note-card:hover {
+  background: rgba(255,255,255,0.7);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.35) inset,
+    0 4px 18px rgba(0,0,0,0.07),
+    0 14px 40px rgba(0,0,0,0.07);
+  transform: translateY(-2px);
+}
+
+/* ── Review card: thick glass with color tint ── */
+[data-style="glass"] .review-card--active {
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,0.65) 0%,
+    rgba(255,255,255,0.55) 50%,
+    var(--primary-bg) 100%
+  );
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.35) inset,
+    0 4px 24px rgba(0,0,0,0.07),
+    0 14px 44px rgba(0,0,0,0.07);
+  border-radius: 14px;
+}
+[data-style="glass"] .review-card--ghost {
+  background: rgba(255,255,255,0.38);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 12px;
+}
+
+/* ── Glass buttons ── */
 [data-style="glass"] .btn--outline {
   background: rgba(255,255,255,0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
 }
 [data-style="glass"] .btn--outline:hover {
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.55);
 }
 [data-style="glass"] .btn--primary {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  background: var(--primary);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+  border-radius: 8px;
+}
+[data-style="glass"] .btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
 }
 
-/* Glass inputs */
+/* ── Glass inputs ── */
 [data-style="glass"] .form-input,
 [data-style="glass"] .form-textarea,
 [data-style="glass"] .search-input input {
@@ -546,13 +732,15 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
 }
 
-/* Glass pills */
+/* ── Glass pills ── */
 [data-style="glass"] .pill {
-  background: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  border-radius: 6px;
 }
 [data-style="glass"] .pill.active {
   background: rgba(0,0,0,0.55);
@@ -562,29 +750,40 @@
   color: #fff;
 }
 
-/* Glass modal */
+/* ── Glass modal ── */
 [data-style="glass"] .modal-overlay {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
 [data-style="glass"] .modal {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255,255,255,0.55);
   border-top: none;
+  border-radius: 14px;
 }
 
-/* Glass toast */
+/* ── Glass toast ── */
 [data-style="glass"] .toast {
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
 }
 
 [data-style="glass"] .review-card__actions {
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+/* ── Stat cards: color-tinted glass ── */
+[data-style="glass"] .stat-card {
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.58) 0%,
+    var(--primary-bg) 100%
+  );
 }
 
 /* Mobile: glass nav */
@@ -600,11 +799,21 @@
     border-right: none !important;
     border-bottom-color: rgba(255,255,255,0.5);
   }
-  /* Ensure glass cards stay glass on mobile */
   [data-style="glass"] .note-card {
-    background: rgba(255,255,255,0.55);
-    backdrop-filter: blur(16px) saturate(120%);
-    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    background: linear-gradient(
+      135deg,
+      rgba(255,255,255,0.58) 0%,
+      var(--primary-bg) 100%
+    );
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+  }
+  [data-style="glass"] .note-card:nth-child(even) {
+    background: linear-gradient(
+      225deg,
+      rgba(255,255,255,0.58) 0%,
+      var(--accent-bg) 100%
+    );
   }
 }
 
@@ -675,64 +884,77 @@
   background: var(--danger);
 }
 
-/* Soft Depth preview: neumorphic emboss */
+/* Soft Depth preview: deeper neumorphic emboss */
 .style-preview--soft-depth {
   background: var(--bg);
   box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.06),
-    inset -2px -2px 5px rgba(255,255,255,0.5);
+    inset 3px 3px 8px rgba(0,0,0,0.07),
+    inset -3px -3px 8px rgba(255,255,255,0.55);
 }
 .style-preview--soft-depth::after {
   content: '';
   position: absolute;
   top: 14px; left: 16px; right: 16px; bottom: 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--bg);
   box-shadow:
-    3px 3px 6px rgba(0,0,0,0.06),
-    -2px -2px 6px rgba(255,255,255,0.55);
+    5px 5px 10px rgba(0,0,0,0.07),
+    -4px -4px 10px rgba(255,255,255,0.6);
 }
 
-/* Tag preview: rotated tag shape with hole */
+/* Tag preview: sticky note with binding rings */
 .style-preview--tag {
-  background: var(--surface);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--primary-bg) 100%);
   border: 1px solid var(--border);
-  border-radius: 3px 10px 3px 10px;
+  border-radius: 2px 10px 2px 10px;
   margin: 10px 14px;
-  transform: rotate(-0.8deg);
+  transform: rotate(-1deg);
+}
+.style-preview--tag::before {
+  content: '';
+  position: absolute;
+  top: 5px; left: 14px; right: 14px;
+  height: 8px;
+  background:
+    radial-gradient(circle 3px, var(--border) 35%, transparent 40%) repeat-x 0 0 / 14px 8px;
+  opacity: 0.4;
 }
 .style-preview--tag::after {
   content: '';
   position: absolute;
-  top: 8px; right: 12px;
-  width: 7px; height: 7px;
+  top: 6px; right: 10px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
   opacity: 0.5;
 }
 
-/* Glass preview: frosted blur effect */
+/* Glass preview: theme-tinted frosted blur */
 .style-preview--glass {
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 6px;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.55) 0%,
+    var(--primary-bg) 100%
+  );
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 8px;
   margin: 8px 10px;
   box-shadow:
     0 1px 0 rgba(255,255,255,0.2) inset,
-    0 2px 6px rgba(0,0,0,0.04);
+    0 2px 8px rgba(0,0,0,0.05);
 }
-/* Glass preview bg needs something to blur — add subtle pattern underneath */
 .style-preview--glass::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 30% 40%, var(--primary) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, var(--accent) 0%, transparent 50%);
-  opacity: 0.15;
+    radial-gradient(circle at 30% 40%, var(--primary-bg) 0%, transparent 55%),
+    radial-gradient(circle at 70% 60%, var(--accent-bg) 0%, transparent 55%);
+  opacity: 0.5;
   z-index: -1;
 }
 
