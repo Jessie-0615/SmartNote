@@ -487,6 +487,13 @@ async function handleGitRoutes(req, res, pathname) {
       const { message } = await readBody(req);
       const msg = message || 'Checkpoint ' + new Date().toISOString().slice(0, 16).replace('T', ' ');
       gitExec('add -A');
+      // Check if there are staged changes
+      const status = gitExec('status --porcelain');
+      if (!status) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ checkpoint: null, message: 'No changes to save' }));
+        return;
+      }
       gitExec('commit -m "' + msg.replace(/"/g, '\\"') + '"');
       const log = gitExec('log -1 --format="%H|%s|%ai"');
       const [hash, ...rest] = log.split('|');
