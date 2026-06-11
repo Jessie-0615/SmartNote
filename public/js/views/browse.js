@@ -66,13 +66,15 @@ function renderBrowse(container) {
     if (!notes.length) { list.innerHTML=`<div class="empty-state"><div class="icon">${currentCat!=='all'?'':'Empty'}</div><h3>${currentSearch?'No matches':'No notes in this category'}</h3><p>${currentSearch?'Try a different search term.':'Add some notes to see them here.'}</p></div>`; return; }
     list.innerHTML=notes.map(n=>{
       const catInfo=categoryInfo(n.category||'');
-      return `<div class="swipe-wrapper" data-id="${n.id}"><div class="swipe-actions"><button class="swipe-btn swipe-btn--fav" data-action="fav">★</button><button class="swipe-btn swipe-btn--del" data-action="del">✕</button></div><div class="swipe-card-inner"><div class="note-card"><div class="note-card__body"><div class="note-card__content">${escapeHtml(n.content)}${n.favorited?' <span style="color:var(--warning)">★</span>':''}</div>${n.userMemo?`<div class="note-card__memo">${escapeHtml(n.userMemo)}</div>`:''}${n.aiChineseTranslation?`<div class="note-card__meta">${escapeHtml(n.aiChineseTranslation)}</div>`:''}</div><span class="badge ${n.category?'badge--'+n.category:''}" style="flex-shrink:0;${!n.category?'background:var(--border);color:var(--text-secondary)':''}">${n.category?catInfo.label:'···'}</span></div></div></div>`; }).join('');
+      return `<div class="swipe-wrapper" data-id="${n.id}"><div class="swipe-actions"><button class="swipe-btn swipe-btn--fav" data-action="fav">★</button><button class="swipe-btn swipe-btn--del" data-action="del">✕</button></div><div class="swipe-card-inner"><div class="note-card"><div class="note-card__body"><div class="note-card__content" data-lookup="${escapeHtml(n.content)}">${escapeHtml(n.content)}${n.favorited?' <span style="color:var(--warning)">★</span>':''}</div>${n.userMemo?`<div class="note-card__memo">${escapeHtml(n.userMemo)}</div>`:''}${n.aiChineseTranslation?`<div class="note-card__meta">${escapeHtml(n.aiChineseTranslation)}</div>`:''}</div><span class="badge ${n.category?'badge--'+n.category:''}" style="flex-shrink:0;${!n.category?'background:var(--border);color:var(--text-secondary)':''}">${n.category?catInfo.label:'···'}</span></div></div></div>`; }).join('');
     // Card click navigation
     list.querySelectorAll('.note-card').forEach(card=>{card.addEventListener('click',()=>{const wrapper=card.closest('.swipe-wrapper');if(wrapper&&wrapper.dataset.swiped==='1')return;location.hash='#/note/'+wrapper.dataset.id;});});
     // Swipe action buttons
     list.querySelectorAll('.swipe-btn').forEach(btn=>{btn.addEventListener('click',async e=>{e.stopPropagation();const wrapper=btn.closest('.swipe-wrapper');const id=wrapper.dataset.id;if(btn.dataset.action==='fav'){const note=await getNote(id);await updateNote(id,{favorited:!note.favorited});closeSwipe(wrapper);refreshList();showToast(note.favorited?'Unfavorited':'Favorited!','success');}else if(btn.dataset.action==='del'){const confirmed=await confirmDialog('Delete Note','Delete this note? This cannot be undone.','Delete',true);if(confirmed){await deleteNote(id);refreshList();showToast('Note deleted','success');}}});});
     // Swipe touch handlers
     attachSwipeHandlers(list);
+    // Enable tap-to-lookup
+    attachWordLookup(list);
   }
 
   function attachSwipeHandlers(list) {

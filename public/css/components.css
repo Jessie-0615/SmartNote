@@ -710,3 +710,102 @@
     background: var(--primary-bg);
   }
 }
+
+
+/* ---- Word Lookup Popup ---- */
+.word-popup {
+  position: fixed;
+  z-index: 300;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-md);
+  animation: popIn 0.2s ease;
+}
+.word-popup__close {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: none; border: none;
+  font-size: 1rem; color: var(--text-tertiary);
+  cursor: pointer; padding: 4px; line-height: 1;
+}
+.word-popup__word {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin-bottom: 2px;
+  padding-right: 24px;
+}
+.word-popup__phonetic {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+.word-popup__audio {
+  display: flex; gap: var(--space-sm); flex-wrap: wrap;
+  margin-bottom: var(--space-sm);
+}
+.word-popup__audio-btn {
+  background: var(--primary-bg);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.word-popup__audio-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+.word-popup__no-audio {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+.word-popup__defs {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-sm);
+}
+.word-popup__def {
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+.word-popup__def:last-child { margin-bottom: 0; }
+.word-popup__pos {
+  display: inline-block;
+  background: var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: var(--space-xs);
+  vertical-align: middle;
+}
+.word-popup__example {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 2px;
+  padding-left: var(--space-sm);
+  border-left: 2px solid var(--border);
+}
+
+/* Tap hint for lookup-enabled words */
+[data-lookup] {
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 2px;
+}
+[data-lookup]:hover {
+  background: var(--primary-bg);
+}

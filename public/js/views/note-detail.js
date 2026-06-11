@@ -144,8 +144,9 @@ async function renderNoteDetail(noteId) {
 
     // Helper: render example items (supports both string and {en, zh} formats)
     const renderExample = (ex) => {
-      if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm)">${highlightNote(ex)}</li>`;
-      return `<li style="margin-bottom:var(--space-sm)">
+      const enText = typeof ex === 'string' ? ex : ex.en;
+      if (typeof ex === 'string') return `<li style="margin-bottom:var(--space-sm)" data-lookup="${escapeHtml(ex)}">${highlightNote(ex)}</li>`;
+      return `<li style="margin-bottom:var(--space-sm)" data-lookup="${escapeHtml(ex.en)}">
         <div>${highlightNote(ex.en)}</div>
         ${ex.zh ? `<div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:2px">${escapeHtml(ex.zh)}</div>` : ''}
       </li>`;
@@ -232,7 +233,7 @@ async function renderNoteDetail(noteId) {
         <span>${reviewDots(note.consecutiveCorrect)}</span>
       </div>
 
-      <h2 style="font-size:var(--font-size-xl);margin-bottom:var(--space-md)">${escapeHtml(note.content)}</h2>
+      <h2 style="font-size:var(--font-size-xl);margin-bottom:var(--space-md)" data-lookup="${escapeHtml(note.content)}">${escapeHtml(note.content)}</h2>
 
       ${note.userMemo ? `
         <div class="memo-box" id="memoBox">
@@ -347,6 +348,9 @@ async function renderNoteDetail(noteId) {
       }
     });
   }
+
+  // Enable tap-to-lookup on English text
+  attachWordLookup(container);
 
   // Expandable section toggles — flip arrow icon
   container.querySelectorAll('.expand-section__header').forEach((header) => {
