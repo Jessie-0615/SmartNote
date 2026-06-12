@@ -422,7 +422,7 @@
   max-width: 90vw; text-align: center;
   letter-spacing: 0.01em;
 }
-.toast--success { background: var(--success); }
+.toast--success { background: var(--primary); }
 .toast--error { background: var(--danger); }
 .toast::before { font-size: 1.1em; flex-shrink: 0; }
 .toast:not(.toast--success):not(.toast--error)::before { content: '~'; font-weight: 700; }
@@ -800,12 +800,3 @@
   border-left: 2px solid var(--border);
 }
 
-/* Tap hint for lookup-enabled words */
-[data-lookup] {
-  cursor: pointer;
-  transition: background 0.15s;
-  border-radius: 2px;
-}
-[data-lookup]:hover {
-  background: var(--primary-bg);
-}

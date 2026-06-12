@@ -95,7 +95,7 @@ function renderReviewCard() {
 
         <div class="review-card__body" id="cardBody">
           ${!revealed ? `
-            <div class="review-card__text" data-lookup="${escapeHtml(note.content)}">${escapeHtml(note.content)}</div>
+            <div class="review-card__text">${escapeHtml(note.content)}</div>
             <div class="review-card__hint">Tap to reveal</div>
           ` : `
             ${note.userMemo ? `
@@ -123,7 +123,7 @@ function renderReviewCard() {
   // Tap to reveal
   if (!revealed && card) {
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.review-mastery-btn') || e.target.closest('.review-card__actions') || e.target.closest('[data-lookup]')) return;
+      if (e.target.closest('.review-mastery-btn') || e.target.closest('.review-card__actions')) return;
       revealCard();
     });
   }
@@ -144,9 +144,6 @@ function renderReviewCard() {
     handleReview(true);
   });
 
-  // Enable tap-to-lookup
-  attachWordLookup(content);
-}
 
 function revealCard() {
   if (!reviewSession) return;

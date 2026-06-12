@@ -129,6 +129,20 @@ function closeWordPopup() {
   document.removeEventListener('click', closeWordPopupOnOutside);
 }
 
+// Preload speech voices (they load async on some browsers)
+let _speechVoices = [];
+function loadVoices() {
+  _speechVoices = speechSynthesis.getVoices();
+  if (_speechVoices.length) return;
+  speechSynthesis.getVoices(); // trigger load on some browsers
+}
+loadVoices();
+if ('speechSynthesis' in window) {
+  speechSynthesis.addEventListener('voiceschanged', () => {
+    _speechVoices = speechSynthesis.getVoices();
+  });
+}
+
 // Global: real voice pronunciation via Web Speech API
 function speakDictWord(word, lang) {
   if (!('speechSynthesis' in window)) {
@@ -139,7 +153,8 @@ function speakDictWord(word, lang) {
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = lang || 'en-US';
   utterance.rate = 0.85;
-  const voices = speechSynthesis.getVoices();
+  // Find best matching voice
+  const voices = _speechVoices.length ? _speechVoices : speechSynthesis.getVoices();
   const enVoice = voices.find(v => v.lang.startsWith(lang || 'en-US') && v.name.includes('Google'))
     || voices.find(v => v.lang.startsWith(lang || 'en-US'))
     || voices.find(v => v.lang.startsWith('en'));
