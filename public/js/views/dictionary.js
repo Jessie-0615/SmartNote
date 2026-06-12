@@ -51,24 +51,34 @@ async function renderDictionary(container) {
     }
   });
 
-  // Load audio for a word from Free Dictionary API (client-side, no key needed)
-  async function fetchAudio(word) {
+  // Real voice pronunciation via Web Speech API (built into browser)
+  function speakWord(word, lang) {
+    if (!('speechSynthesis' in window)) {
+      showToast('Speech not supported on this device', 'error');
+      return;
+    }
+    speechSynthesis.cancel(); // stop any ongoing speech
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = lang;
+    utterance.rate = 0.85;
+    // Load voices (some browsers load them async)
+    const voices = speechSynthesis.getVoices();
+    const enVoice = voices.find(v => v.lang.startsWith(lang) && v.name.includes('Google'))
+      || voices.find(v => v.lang.startsWith(lang))
+      || voices.find(v => v.lang.startsWith('en'));
+    if (enVoice) utterance.voice = enVoice;
+    speechSynthesis.speak(utterance);
+  }
+
+  // Fetch phonetic info from Free Dictionary API (text only, no audio files)
+  async function fetchPhonetic(word) {
     try {
       const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
-      if (!res.ok) return { phonetic: '', audioUK: '', audioUS: '' };
+      if (!res.ok) return '';
       const data = await res.json();
-      if (!Array.isArray(data) || !data.length) return { phonetic: '', audioUK: '', audioUS: '' };
-      const allPhonetics = [];
-      for (const p of (data[0].phonetics || [])) {
-        allPhonetics.push({ text: p.text || '', audio: p.audio || '' });
-      }
-      return {
-        phonetic: allPhonetics.find(p => p.text)?.text || data[0].phonetic || '',
-        audioUK: allPhonetics.find(p => p.audio && p.audio.includes('-uk'))?.audio || '',
-        audioUS: allPhonetics.find(p => p.audio && p.audio.includes('-us'))?.audio || '',
-        audioAny: allPhonetics.find(p => p.audio)?.audio || '',
-      };
-    } catch { return { phonetic: '', audioUK: '', audioUS: '' }; }
+      if (!Array.isArray(data) || !data.length) return '';
+      return data[0].phonetic || (data[0].phonetics || []).find(p => p.text)?.text || '';
+    } catch { return ''; }
   }
 
   async function doSearch(query) {
@@ -87,44 +97,40 @@ async function renderDictionary(container) {
       }
       const data = await res.json();
 
-      // Try to get audio for English words
-      let audioInfo = { phonetic: data.phonetic || '', audioUK: '', audioUS: '' };
-      if (direction === 'en-zh' || data.word.match(/[a-zA-Z]/)) {
+      // Fetch phonetic text (not audio — we use real voice for that)
+      let phonetic = data.phonetic || '';
+      if (!phonetic && (direction === 'en-zh' || data.word.match(/[a-zA-Z]/))) {
         const enWord = direction === 'en-zh' ? data.word : (data.englishTranslation || '').split(' ')[0];
-        if (enWord) {
-          const fetched = await fetchAudio(enWord);
-          audioInfo.phonetic = fetched.phonetic || data.phonetic || '';
-          audioInfo.audioUK = fetched.audioUK || '';
-          audioInfo.audioUS = fetched.audioUS || '';
-          audioInfo.audioAny = fetched.audioAny || '';
-        }
+        if (enWord) phonetic = await fetchPhonetic(enWord) || '';
       }
 
-      renderResult(data, audioInfo);
+      renderResult(data, phonetic);
     } catch (err) {
       resultDiv.innerHTML = `<div class="empty-state"><h3>Lookup failed</h3><p>${escapeHtml(err.message)}</p></div>`;
     }
   }
 
-  function renderResult(data, audio) {
+  function renderResult(data, phonetic) {
     const resultDiv = document.getElementById('dictResult');
     const isEn = direction === 'en-zh';
     const translation = isEn ? data.chineseTranslation : data.englishTranslation;
+    const spokenWord = isEn ? data.word : (data.englishTranslation || data.word);
 
-    const audioBtns = [];
-    if (audio.audioUK) audioBtns.push(`<button class="word-popup__audio-btn" onclick="new Audio('${audio.audioUK}').play()">▶ UK</button>`);
-    if (audio.audioUS) audioBtns.push(`<button class="word-popup__audio-btn" onclick="new Audio('${audio.audioUS}').play()">▶ US</button>`);
-    if (!audioBtns.length && audio.audioAny) audioBtns.push(`<button class="word-popup__audio-btn" onclick="new Audio('${audio.audioAny}').play()">▶ Listen</button>`);
-
+    const escapedWord = escapeHtml(data.word);
+    const escapedTranslation = escapeHtml(translation || '');
     resultDiv.innerHTML = `
       <div class="card" style="border-left:4px solid var(--primary)">
-        <div class="flex-between mb-md">
+        <div class="flex-between mb-md" style="flex-wrap:wrap;gap:var(--space-sm)">
           <div>
-            <h2 style="font-family:var(--font-display);font-size:1.6rem;margin:0">${escapeHtml(data.word)}</h2>
-            ${audio.phonetic ? `<div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:4px">${escapeHtml(audio.phonetic)}</div>` : ''}
+            <h2 style="font-family:var(--font-display);font-size:1.6rem;margin:0">${escapedWord}</h2>
+            ${phonetic ? `<div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:4px">${escapeHtml(phonetic)}</div>` : ''}
             ${data.pos ? `<span class="badge" style="margin-top:6px">${escapeHtml(data.pos)}</span>` : ''}
           </div>
-          ${audioBtns.length ? `<div style="display:flex;gap:var(--space-sm);flex-shrink:0">${audioBtns.join('')}</div>` : ''}
+          <div style="display:flex;gap:var(--space-sm);flex-shrink:0;flex-wrap:wrap">
+            <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedWord.replace(/'/g,"\\'")}','en-US')" title="US voice">🇺🇸 Listen</button>
+            <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedWord.replace(/'/g,"\\'")}','en-GB')" title="UK voice">🇬🇧 Listen</button>
+            <button class="btn btn--primary btn--sm" id="addToNotesBtn" style="font-size:var(--font-size-xs)">+ Add to Notes</button>
+          </div>
         </div>
 
         ${translation ? `
@@ -176,6 +182,27 @@ async function renderDictionary(container) {
       </div>
     `;
 
+    // Wire up Add to Notes button
+    document.getElementById('addToNotesBtn')?.addEventListener('click', async () => {
+      const note = createNoteWithSM2({
+        id: uuid(),
+        content: data.word,
+        userMemo: translation ? (isEn ? `中文: ${translation}` : `English: ${translation}`) : null,
+        category: null,
+        aiExpanded: false,
+      });
+      // Try AI categorization
+      try {
+        const category = await aiCategorize(note.content);
+        note.category = category;
+        note.aiCategorizedAt = Date.now();
+      } catch (_) { /* will be uncategorized */ }
+      await saveNote(note);
+      showToast(`"${data.word}" added to notes!`, 'success');
+      const btn = document.getElementById('addToNotesBtn');
+      if (btn) { btn.textContent = '✓ Added'; btn.disabled = true; }
+    });
+
     // Make related words clickable
     resultDiv.querySelectorAll('.badge[style*="cursor:pointer"]').forEach(badge => {
       badge.addEventListener('click', () => {
@@ -186,3 +213,4 @@ async function renderDictionary(container) {
     });
   }
 }
+

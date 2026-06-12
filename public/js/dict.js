@@ -72,22 +72,16 @@ function showWordPopup(word, data, targetEl) {
   popup.id = 'wordPopup';
   popup.className = 'word-popup';
 
-  const audioBtn = (url, label) => {
-    if (!url) return '';
-    return `<button class="word-popup__audio-btn" onclick="event.stopPropagation();new Audio('${url}').play()" title="Play ${label}">▶ ${label}</button>`;
-  };
-
-  const audioHTML = [];
-  if (data.audioUK) audioHTML.push(audioBtn(data.audioUK, 'UK'));
-  if (data.audioUS) audioHTML.push(audioBtn(data.audioUS, 'US'));
-  if (!audioHTML.length && data.audioAny) audioHTML.push(audioBtn(data.audioAny, '▶'));
-  if (!audioHTML.length) audioHTML.push('<span class="word-popup__no-audio">No audio</span>');
+  const escapedW = escapeHtml(data.word).replace(/'/g, "\\'");
 
   popup.innerHTML = `
     <button class="word-popup__close" onclick="closeWordPopup()">✕</button>
     <div class="word-popup__word">${escapeHtml(data.word)}</div>
     ${data.phonetic ? `<div class="word-popup__phonetic">${escapeHtml(data.phonetic)}</div>` : ''}
-    <div class="word-popup__audio">${audioHTML.join(' ')}</div>
+    <div class="word-popup__audio">
+      <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedW}','en-US')">🇺🇸 Listen</button>
+      <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedW}','en-GB')">🇬🇧 Listen</button>
+    </div>
     ${data.definitions.length ? `
       <div class="word-popup__defs">
         ${data.definitions.map(d => `
@@ -133,6 +127,24 @@ function closeWordPopup() {
   const popup = document.getElementById('wordPopup');
   if (popup) popup.remove();
   document.removeEventListener('click', closeWordPopupOnOutside);
+}
+
+// Global: real voice pronunciation via Web Speech API
+function speakDictWord(word, lang) {
+  if (!('speechSynthesis' in window)) {
+    showToast('Speech not supported on this device', 'error');
+    return;
+  }
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = lang || 'en-US';
+  utterance.rate = 0.85;
+  const voices = speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang.startsWith(lang || 'en-US') && v.name.includes('Google'))
+    || voices.find(v => v.lang.startsWith(lang || 'en-US'))
+    || voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) utterance.voice = enVoice;
+  speechSynthesis.speak(utterance);
 }
 
 /**
