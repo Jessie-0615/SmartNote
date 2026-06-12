@@ -247,9 +247,6 @@ async function init() {
     await migrateNotes();
     console.log('IndexedDB ready');
 
-    // Seed demo notes on first visit (empty database)
-    await seedDemoIfEmpty();
-
     // Start sync engine (no-op if not paired)
     initSyncEngine();
   } catch (err) {
@@ -274,6 +271,9 @@ async function init() {
     location.hash = '#/add';
     navigate('#/add');
   }
+
+  // Seed demo notes in background (don't block the UI)
+  seedDemoIfEmpty().catch(() => {});
 }
 
 // Boot

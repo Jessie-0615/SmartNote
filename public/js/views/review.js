@@ -10,7 +10,16 @@ async function renderReview(container) {
     <div class="page-header"><h2>Review</h2><p>Practice your notes at your own pace.</p></div>
     <div id="reviewContent"></div>
   `;
-  await showPreStart();
+  try {
+    await showPreStart();
+  } catch (err) {
+    document.getElementById('reviewContent').innerHTML = `
+      <div class="empty-state">
+        <h3>Review Error</h3>
+        <p style="color:var(--danger)">${escapeHtml(err.message)}</p>
+      </div>`;
+    console.error('Review error:', err);
+  }
 }
 
 /**
