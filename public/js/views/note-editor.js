@@ -6,7 +6,7 @@ function renderNoteEditor(container) {
   container.innerHTML = `
     <div class="page-header">
       <h2>Add a Note</h2>
-      <p>Enter any English word, phrase, sentence, or pattern you want to learn.</p>
+      <p>Enter any vocabulary, phrase, usage, paragraph, or anything else you want to accumulate.</p>
     </div>
 
     <form id="noteForm" class="card">
