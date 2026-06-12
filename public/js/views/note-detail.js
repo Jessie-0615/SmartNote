@@ -287,6 +287,7 @@ async function renderNoteDetail(noteId) {
       e.stopPropagation();
       const updated = await updateNote(note.id, { favorited: !note.favorited });
       showToast(updated.favorited ? 'Favorited!' : 'Unfavorited', 'success');
+      if (updated.favorited) Sound.sparkle();
       renderNoteDetail(noteId);
     });
   }
@@ -394,6 +395,7 @@ async function renderNoteDetail(noteId) {
       if (confirmed) {
         await deleteNote(note.id);
         showToast('Note deleted', 'success');
+        Sound.swoosh();
         location.hash = '#/browse';
       }
     });

@@ -165,8 +165,8 @@ async function handleReview(remembered) {
     repetitionsAfter: note.repetitions
   });
 
-  if (remembered) reviewSession.remembered++;
-  else reviewSession.forgotten++;
+  if (remembered) { reviewSession.remembered++; Sound.ding(); }
+  else { reviewSession.forgotten++; Sound.thud(); }
 
   var card = document.getElementById('reviewCard');
   if (card) {
@@ -186,6 +186,7 @@ async function handleMastered() {
   markMastered(note);
   await updateNote(note.id, { isMastered: true });
   reviewSession.mastered++;
+  Sound.sparkle();
 
   var card = document.getElementById('reviewCard');
   if (card) {
