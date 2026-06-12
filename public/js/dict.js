@@ -78,10 +78,6 @@ function showWordPopup(word, data, targetEl) {
     <button class="word-popup__close" onclick="closeWordPopup()">✕</button>
     <div class="word-popup__word">${escapeHtml(data.word)}</div>
     ${data.phonetic ? `<div class="word-popup__phonetic">${escapeHtml(data.phonetic)}</div>` : ''}
-    <div class="word-popup__audio">
-      <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedW}','en-US')">🇺🇸 Listen</button>
-      <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedW}','en-GB')">🇬🇧 Listen</button>
-    </div>
     ${data.definitions.length ? `
       <div class="word-popup__defs">
         ${data.definitions.map(d => `

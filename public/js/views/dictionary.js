@@ -139,8 +139,6 @@ async function renderDictionary(container) {
             ${data.pos ? `<span class="badge" style="margin-top:6px">${escapeHtml(data.pos)}</span>` : ''}
           </div>
           <div style="display:flex;gap:var(--space-sm);flex-shrink:0;flex-wrap:wrap">
-            <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedWord.replace(/'/g,"\\'")}','en-US')" title="US voice">🇺🇸 Listen</button>
-            <button class="word-popup__audio-btn" onclick="event.stopPropagation();speakDictWord('${escapedWord.replace(/'/g,"\\'")}','en-GB')" title="UK voice">🇬🇧 Listen</button>
             <button class="btn btn--primary btn--sm" id="addToNotesBtn" style="font-size:var(--font-size-xs)">+ Add to Notes</button>
           </div>
         </div>
