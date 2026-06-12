@@ -137,6 +137,5 @@ function renderNoteEditor(container) {
     document.getElementById('noteContent').focus();
 
     showToast('Note saved!', 'success');
-    Sound.pop();
   });
 }

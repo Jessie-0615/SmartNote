@@ -659,22 +659,6 @@
 }
 .swipe-card-inner.swiped { transform: translateX(-130px); }
 
-/* ---- Toggle Switch ---- */
-.toggle-switch {
-  position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0;
-}
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--border); border-radius: 26px; transition: 0.25s;
-}
-.toggle-slider::before {
-  content: ''; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px;
-  background: #fff; border-radius: 50%; transition: 0.25s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-}
-.toggle-switch input:checked + .toggle-slider { background: var(--primary); }
-.toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); }
-
 /* ---- Misc Utilities ---- */
 .text-center { text-align: center; }
 .text-secondary { color: var(--text-secondary); }
@@ -686,32 +670,6 @@
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
 .gap-sm { gap: var(--space-sm); }
 .gap-md { gap: var(--space-md); }
-
-/* ---- Cute Interaction Animations ---- */
-.btn:active { transform: scale(0.94); transition: transform 0.1s; }
-
-/* Favorite star burst */
-@keyframes starBurst {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.5); }
-  60% { transform: scale(0.85); }
-  100% { transform: scale(1); }
-}
-.star-burst { animation: starBurst 0.4s ease; }
-
-/* Success pop */
-@keyframes successPop {
-  0% { transform: scale(0.8); opacity: 0.5; }
-  60% { transform: scale(1.08); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-/* Gentle float for empty state icons */
-@keyframes gentleFloat {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-.review-empty__icon { animation: gentleFloat 3s ease-in-out infinite; }
 
 /* Mobile: clean gradient for note cards */
 @media (max-width: 767px) {

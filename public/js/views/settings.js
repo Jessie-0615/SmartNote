@@ -63,20 +63,6 @@ async function renderSettings(container) {
       <div class="theme-grid" id="styleGrid"></div>
     </div>
 
-    <!-- Sound Effects -->
-    <div class="card mb-md">
-      <div class="flex-between" style="align-items:center">
-        <div>
-          <h3 style="font-size:var(--font-size-md)">Sound Effects</h3>
-          <p class="text-secondary" style="font-size:var(--font-size-sm)">Cute sounds for save, review, favorite and more.</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="soundToggle" ${Sound.enabled() ? 'checked' : ''}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
     <!-- Sync & Pairing -->
     <div class="card mb-md">
       <div class="flex-between">
@@ -225,12 +211,6 @@ async function renderSettings(container) {
   document.getElementById('checkApiBtn')?.addEventListener('click', checkApiHealth);
 
   // Export
-  // Sound toggle
-  document.getElementById('soundToggle')?.addEventListener('change', function () {
-    Sound.enabled(this.checked);
-    localStorage.setItem('engnotes_sound', this.checked ? '1' : '0');
-  });
-
   document.getElementById('exportBtn')?.addEventListener('click', async () => {
     try {
       const data = await exportAllData();

@@ -209,7 +209,6 @@ async function renderDictionary(container) {
       } catch (_) { /* will be uncategorized */ }
       await saveNote(note);
       showToast(`"${data.word}" added to notes!`, 'success');
-      Sound.pop();
       const btn = document.getElementById('addToNotesBtn');
       if (btn) { btn.textContent = '✓ Added'; btn.disabled = true; }
     });
@@ -262,7 +261,6 @@ async function renderDictionary(container) {
       } catch (_) { /* will be uncategorized */ }
       await saveNote(note);
       showToast('Translation added to notes!', 'success');
-      Sound.pop();
       const btn = document.getElementById('addToNotesBtn');
       if (btn) { btn.textContent = '✓ Added'; btn.disabled = true; }
     });

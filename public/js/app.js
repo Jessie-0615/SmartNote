@@ -241,9 +241,6 @@ async function init() {
     document.documentElement.setAttribute('data-style', savedStyle);
   }
 
-  // Load sound preference (default enabled)
-  if (localStorage.getItem('engnotes_sound') === '0') Sound.enabled(false);
-
   try {
     // Open the database
     await openDB();
