@@ -196,6 +196,52 @@ function callDeepSeek(messages, apiKey, temperature = 0.3) {
 }
 
 // ---------------------------------------------------------------------------
+// /api/dictionary — bilingual lookup
+// ---------------------------------------------------------------------------
+async function handleDictionary(req, res, apiKey) {
+  const { word, direction } = await readBody(req);
+  const dir = direction === 'zh-en' ? 'zh-en' : 'en-zh';
+  const isEnToZh = dir === 'en-zh';
+
+  if (!word || typeof word !== 'string' || word.trim().length < 1) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Missing or empty "word" field' }));
+    return;
+  }
+
+  const systemPrompt = isEnToZh
+    ? `You are a bilingual English-Chinese dictionary. Given an English word or phrase, return JSON: {"word":"...","phonetic":"/IPA/","pos":"noun/verb/etc","chineseTranslation":"中文","definition":"Chinese definition","definitionEn":"English definition","examples":[{"en":"...","zh":"..."}],"related":["word (翻译)"]}. ONLY valid JSON, no markdown.`
+    : `You are a bilingual Chinese-English dictionary. Given a Chinese word or phrase, return JSON: {"word":"...","phonetic":"pinyin","pos":"noun/verb/etc","englishTranslation":"English","definition":"Chinese definition","definitionEn":"English definition","examples":[{"zh":"...","en":"..."}],"related":["词 (translation)"]}. ONLY valid JSON, no markdown.`;
+
+  const raw = await callDeepSeek([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: word.trim() },
+  ], apiKey, 0.3);
+
+  let result;
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (jsonMatch) { try { result = JSON.parse(jsonMatch[0]); } catch { } }
+
+  if (!result) {
+    result = isEnToZh
+      ? { word: word.trim(), phonetic:'', pos:'', chineseTranslation: raw.trim(), definition:'', definitionEn:'', examples:[], related:[] }
+      : { word: word.trim(), phonetic:'', pos:'', englishTranslation: raw.trim(), definition:'', definitionEn:'', examples:[], related:[] };
+  }
+  result.word = result.word || word.trim();
+  result.phonetic = result.phonetic || '';
+  result.pos = result.pos || '';
+  result.chineseTranslation = result.chineseTranslation || result.englishTranslation || '';
+  result.englishTranslation = result.englishTranslation || result.chineseTranslation || '';
+  result.definition = result.definition || '';
+  result.definitionEn = result.definitionEn || '';
+  result.examples = Array.isArray(result.examples) ? result.examples.slice(0,3).map(ex=>({en:ex.en||'',zh:ex.zh||''})) : [];
+  result.related = Array.isArray(result.related) ? result.related.slice(0,4) : [];
+
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ ...result, direction: dir }));
+}
+
+// ---------------------------------------------------------------------------
 // /api/categorize — classify the entry
 // ---------------------------------------------------------------------------
 async function handleCategorize(req, res, apiKey) {
@@ -601,6 +647,8 @@ const server = http.createServer(async (req, res) => {
         await handleCategorize(req, res, resolvedKey);
       } else if (pathname === '/api/expand' && req.method === 'POST') {
         await handleExpand(req, res, resolvedKey);
+      } else if (pathname === '/api/dictionary' && req.method === 'POST') {
+        await handleDictionary(req, res, resolvedKey);
       } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Not found' }));

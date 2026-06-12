@@ -233,6 +233,75 @@ IMPORTANT: All explanations should be in SIMPLE Chinese so that English beginner
 }
 
 // ---------------------------------------------------------------------------
+// /api/dictionary — bilingual dictionary lookup
+// ---------------------------------------------------------------------------
+async function handleDictionary(body, apiKey) {
+  const { word, direction } = body; // direction: 'en-zh' or 'zh-en'
+  const dir = direction === 'zh-en' ? 'zh-en' : 'en-zh';
+  const isEnToZh = dir === 'en-zh';
+
+  if (!word || typeof word !== 'string' || word.trim().length < 1) {
+    return { status: 400, body: { error: 'Missing or empty "word" field' } };
+  }
+
+  const systemPrompt = isEnToZh
+    ? `You are a bilingual English-Chinese dictionary. Given an English word or phrase, return a JSON object with:
+- "word": the original English word
+- "phonetic": IPA pronunciation (e.g., /sɪˈrɛndɪpɪti/)
+- "pos": part of speech (e.g., noun, verb, adjective)
+- "chineseTranslation": Chinese translation (simplified Chinese)
+- "definition": definition IN CHINESE, clear and simple
+- "definitionEn": definition in English, 1-2 sentences
+- "examples": array of 2-3 objects with "en" (English example) and "zh" (Chinese translation)
+- "related": array of 2-3 related English words with their Chinese translations as strings like "word (翻译)"
+
+Return ONLY valid JSON, no markdown, no code fences.`
+    : `You are a bilingual Chinese-English dictionary. Given a Chinese word or phrase, return a JSON object with:
+- "word": the original Chinese word
+- "phonetic": pinyin with tone marks (e.g., "xìng fú")
+- "pos": part of speech in English (e.g., noun, verb, adjective)
+- "englishTranslation": English translation
+- "definition": definition IN CHINESE, clear and simple
+- "definitionEn": definition in English, 1-2 sentences
+- "examples": array of 2-3 objects with "zh" (Chinese example) and "en" (English translation)
+- "related": array of 2-3 related Chinese words with their English translations as strings like "单词 (translation)"
+
+Return ONLY valid JSON, no markdown, no code fences.`;
+
+  const raw = await callDeepSeek([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: word.trim() },
+  ], apiKey, 0.3);
+
+  let result;
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try { result = JSON.parse(jsonMatch[0]); } catch { /* fallback */ }
+  }
+
+  if (!result) {
+    result = isEnToZh
+      ? { word: word.trim(), phonetic: '', pos: '', chineseTranslation: raw.trim(), definition: '', definitionEn: '', examples: [], related: [] }
+      : { word: word.trim(), phonetic: '', pos: '', englishTranslation: raw.trim(), definition: '', definitionEn: '', examples: [], related: [] };
+  }
+
+  // Normalize
+  result.word = result.word || word.trim();
+  result.phonetic = result.phonetic || '';
+  result.pos = result.pos || '';
+  result.chineseTranslation = result.chineseTranslation || result.englishTranslation || '';
+  result.englishTranslation = result.englishTranslation || result.chineseTranslation || '';
+  result.definition = result.definition || '';
+  result.definitionEn = result.definitionEn || '';
+  result.examples = Array.isArray(result.examples) ? result.examples.slice(0, 3).map(ex => ({
+    en: ex.en || '', zh: ex.zh || ''
+  })) : [];
+  result.related = Array.isArray(result.related) ? result.related.slice(0, 4) : [];
+
+  return { status: 200, body: { ...result, direction: dir } };
+}
+
+// ---------------------------------------------------------------------------
 // Main handler
 // ---------------------------------------------------------------------------
 module.exports = async (req, res) => {
@@ -318,6 +387,23 @@ module.exports = async (req, res) => {
       }
       body.content = sanitize(body.content);
       const result = await handleExpand(body, resolvedKey);
+      res.status(result.status).json(result.body);
+      return;
+    }
+
+    if (pathname === '/api/dictionary' && req.method === 'POST') {
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+      if (!checkRateLimit(ip)) {
+        res.status(429).json({ error: 'Too many requests. Please slow down.' });
+        return;
+      }
+      const body = await readBody(req);
+      if (isBlocked(body.word || '')) {
+        res.status(400).json({ error: 'Invalid input' });
+        return;
+      }
+      body.word = sanitize(body.word);
+      const result = await handleDictionary(body, resolvedKey);
       res.status(result.status).json(result.body);
       return;
     }

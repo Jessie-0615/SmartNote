@@ -6,6 +6,7 @@ const ROUTES = {
   '#/add': { title: 'Add Note', view: 'note-editor' },
   '#/browse': { title: 'Browse', view: 'browse' },
   '#/review': { title: 'Review', view: 'review' },
+  '#/dictionary': { title: 'Dictionary', view: 'dictionary' },
   '#/stats': { title: 'Statistics', view: 'stats' },
   '#/settings': { title: 'Settings', view: 'settings' },
 };
@@ -53,6 +54,7 @@ function navigate(route) {
     case 'note-editor': renderNoteEditor(main); break;
     case 'browse': renderBrowse(main); break;
     case 'review': renderReview(main); break;
+    case 'dictionary': renderDictionary(main); break;
     case 'stats': renderStats(main); break;
     case 'settings': renderSettings(main); break;
   }
