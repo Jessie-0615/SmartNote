@@ -28,10 +28,6 @@ async function renderStats(container) {
         <div class="stat-card__value" id="statTotalReviews">—</div>
         <div class="stat-card__label">Total Reviews</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card__value" id="statAvgEase">—</div>
-        <div class="stat-card__label">Avg. Ease Factor</div>
-      </div>
     </div>
 
     <!-- Chart: Entries Added -->
@@ -101,13 +97,9 @@ async function loadStats(period) {
 
   const totalNotes = allNotes.length;
   const totalReviews = allReviews.length;
-  const avgEase = allNotes.length
-    ? (allNotes.reduce((s, n) => s + (n.easeFactor || 2.5), 0) / allNotes.length).toFixed(1)
-    : '2.5';
 
   document.getElementById('statTotalNotes').textContent = totalNotes;
   document.getElementById('statTotalReviews').textContent = totalReviews;
-  document.getElementById('statAvgEase').textContent = avgEase;
 
   // Aggregate into buckets
   const buckets = getBuckets(period, start, bucketFn);
