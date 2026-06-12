@@ -28,8 +28,11 @@ async function renderNoteDetail(noteId) {
 
   const info = categoryInfo(note.category || '');
 
-  // Review progress dots (0-6, from consecutiveCorrect)
-  function reviewDots(cc) {
+  // Review progress dots or mastery indicator
+  function reviewDots(cc, mastered) {
+    if (mastered || (cc || 0) >= 5) {
+      return `<span style="font-size:var(--font-size-xs);color:var(--primary);font-weight:700">✦ Mastered</span>`;
+    }
     const total = 6; const filled = Math.min(cc || 0, total);
     let d = '<span style="font-size:var(--font-size-xs);color:var(--text-tertiary);margin-right:6px">Review</span>';
     for (let i = 0; i < total; i++) {
@@ -229,7 +232,7 @@ async function renderNoteDetail(noteId) {
           </span>
           <button class="btn btn--ghost btn--sm" id="editMetaBtn" style="font-size:var(--font-size-xs)">Edit</button>
         </div>
-        <span>${reviewDots(note.consecutiveCorrect)}</span>
+        <span>${reviewDots(note.consecutiveCorrect, note.isMastered)}</span>
       </div>
 
       <h2 style="font-size:var(--font-size-xl);margin-bottom:var(--space-md)">${escapeHtml(note.content)}</h2>
