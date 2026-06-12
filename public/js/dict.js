@@ -133,14 +133,14 @@ function closeWordPopup() {
 let _speechVoices = [];
 function loadVoices() {
   _speechVoices = speechSynthesis.getVoices();
-  if (_speechVoices.length) return;
-  speechSynthesis.getVoices(); // trigger load on some browsers
 }
 loadVoices();
 if ('speechSynthesis' in window) {
   speechSynthesis.addEventListener('voiceschanged', () => {
     _speechVoices = speechSynthesis.getVoices();
   });
+  // Chrome loads voices async — retry after a short delay
+  setTimeout(() => { if (!_speechVoices.length) _speechVoices = speechSynthesis.getVoices(); }, 500);
 }
 
 // Global: real voice pronunciation via Web Speech API
@@ -149,16 +149,35 @@ function speakDictWord(word, lang) {
     showToast('Speech not supported on this device', 'error');
     return;
   }
+
+  // Always get fresh voices (don't rely on cache alone)
+  var voices = speechSynthesis.getVoices();
+  if (!voices.length) voices = _speechVoices;
+  if (!voices.length) {
+    // Voices not loaded yet — try again after a moment
+    showToast('Loading voices... tap again', 'info');
+    speechSynthesis.getVoices(); // trigger load
+    return;
+  }
+
   speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(word);
+  var utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = lang || 'en-US';
   utterance.rate = 0.85;
-  // Find best matching voice
-  const voices = _speechVoices.length ? _speechVoices : speechSynthesis.getVoices();
-  const enVoice = voices.find(v => v.lang.startsWith(lang || 'en-US') && v.name.includes('Google'))
-    || voices.find(v => v.lang.startsWith(lang || 'en-US'))
-    || voices.find(v => v.lang.startsWith('en'));
+  utterance.volume = 1;
+
+  // Find best matching voice: prefer Google > native > any English
+  var enVoice = voices.find(function(v) { return v.lang.startsWith(lang || 'en-US') && v.name.indexOf('Google') !== -1; })
+    || voices.find(function(v) { return v.lang.startsWith(lang || 'en-US'); })
+    || voices.find(function(v) { return v.lang.indexOf('en') === 0; });
+
   if (enVoice) utterance.voice = enVoice;
+
+  utterance.onerror = function(e) {
+    console.error('Speech error:', e.error);
+    if (e.error === 'not-allowed') showToast('Tap the button to listen', 'info');
+  };
+
   speechSynthesis.speak(utterance);
 }
 
