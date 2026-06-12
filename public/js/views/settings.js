@@ -93,8 +93,9 @@ async function renderSettings(container) {
       <p class="text-secondary" style="font-size:var(--font-size-sm)">
         Export your notes and review history as a JSON file, or clear all data.
       </p>
-      <div class="flex gap-sm mt-md">
+      <div class="flex gap-sm mt-md" style="flex-wrap:wrap">
         <button class="btn btn--outline" id="exportBtn">Export All Data</button>
+        <button class="btn btn--outline btn--sm" id="resetDemoBtn">Reset to Demo Data</button>
         <button class="btn btn--ghost" id="clearBtn" style="color:var(--danger)">Clear All Data</button>
       </div>
     </div>
@@ -246,6 +247,22 @@ async function renderSettings(container) {
         showToast('All data cleared', 'success');
         location.hash = '#/add';
       }
+    }
+  });
+
+  // Reset to demo data
+  document.getElementById('resetDemoBtn')?.addEventListener('click', async () => {
+    const confirmed = await confirmDialog(
+      'Reset to Demo Data',
+      'This will replace all your current notes with sample notes showing different categories. Your existing data will be lost.',
+      'Replace with Demo',
+      true
+    );
+    if (confirmed) {
+      await clearAllData();
+      await seedDemoIfEmpty();
+      showToast('Demo notes loaded — browse around!', 'success');
+      location.hash = '#/browse';
     }
   });
 

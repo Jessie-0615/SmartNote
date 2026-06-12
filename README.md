@@ -1,22 +1,20 @@
 # SmartNote
 
-AI-powered English learning PWA with spaced repetition review. Add words and phrases, get AI-generated Chinese translations, bilingual definitions, examples, and etymology. Review with SM-2 spaced repetition to build long-term memory.
+**An effortless English accumulation notebook.** Jot things down — the app figures out what kind of entry it is and organizes it for you. No manual sorting, no friction. The goal isn't to push you to "study harder"; it's to make saving English snippets so painless that accumulation becomes a natural habit.
 
 **[Live Demo](https://smart-note-mocha.vercel.app)**
 
-## Features
+## What it does
 
-- **AI Expansion** — DeepSeek AI provides Chinese translation, bilingual definitions, example sentences, etymology, and related expressions
-- **Spaced Repetition** — SM-2 algorithm with 6 review intervals (1→3→7→14→30→60 days)
-- **12 Color Themes** — Vintage Paper, Dark Mode, Mint Fresh, Soft Butter, Dusty Rose, Sky Blue, Lavender, Hot Pink Teal, Raspberry, Terra, Pop, Warm Peach
-- **5 Interface Styles** — Original, Soft Depth (neumorphic), Editorial (linen texture), Tag (sticky notes), Frosted Glass (acrylic blur)
-- **PWA** — Install to your phone's home screen, works offline
-- **IndexedDB Storage** — All your notes stay on your device
-- **Cross-device Sync** — Pair devices to sync notes (requires local server)
+- **Auto-categorization** — Drop in a word, phrase, idiom, sentence, or common expression. AI classifies it automatically so you never have to sort by hand.
+- **AI Expansion** — For words and short phrases, get Chinese translations, bilingual definitions, example sentences, etymology, and related expressions — all generated on the spot.
+- **Spaced Repetition** — SM-2 algorithm with 6 intervals (1→3→7→14→30→60 days). Review at the right moment to lock it into long-term memory.
+- **Dictionary** — Bilingual EN↔ZH lookup with pronunciation. Paste a long sentence or paragraph and get a clean translation.
+- **12 Themes + 5 Visual Styles** — Vintage Paper, Dark Mode, Mint Fresh, and more. Switch anytime.
+- **PWA** — Install to your phone's home screen. Works offline. All notes live in your browser via IndexedDB.
+- **Cross-device Sync** — Pair devices to sync notes (requires the local Node.js server with SQLite).
 
 ## Quick Start
-
-### Run locally
 
 ```bash
 git clone https://github.com/Jessie-0615/SmartNote.git
@@ -31,29 +29,26 @@ DEEPSEEK_API_KEY=sk-your-key-here
 PORT=3000
 ```
 
-Get a free API key at [platform.deepseek.com](https://platform.deepseek.com/api_keys).
+Get a free key at [platform.deepseek.com](https://platform.deepseek.com/api_keys).
 
 ```bash
 npm start
 ```
 
-Open `http://localhost:3000` in your browser.
+Open `http://localhost:3000`.
 
 ### Deploy to Vercel
 
 1. Fork this repo
 2. Import to [Vercel](https://vercel.com)
-3. Set environment variable `DEEPSEEK_API_KEY` to your API key
+3. Set `DEEPSEEK_API_KEY` in environment variables
 4. Deploy
 
-The app works fully on Vercel — AI features run through the serverless function, notes stay in each user's browser IndexedDB. Cross-device sync requires running the local Node.js server (uses SQLite).
+AI features run through Vercel's serverless function. Notes stay in each user's browser. Cross-device sync requires the local Node.js server.
 
 ## Tech Stack
 
-- **Frontend**: Vanilla JS SPA with hash router, IndexedDB, Service Worker (PWA)
-- **Backend**: Node.js + better-sqlite3 (local sync), Vercel serverless function (AI proxy)
-- **AI**: DeepSeek API (OpenAI-compatible)
-- **Fonts**: DM Serif Display + DM Sans (Google Fonts)
+Vanilla JS SPA (hash router, IndexedDB, Service Worker) · Node.js + better-sqlite3 · DeepSeek API · DM Serif Display + DM Sans
 
 ## License
 
