@@ -529,7 +529,7 @@
 /* Notebook headers match badge colors exactly */
 .nb-header--word { background: var(--badge-word-bg); color: var(--badge-word-text); }
 .nb-header--phrase { background: var(--badge-phrase-bg); color: var(--badge-phrase-text); }
-.nb-header--sentence_pattern { background: var(--badge-pattern-bg); color: var(--badge-pattern-text); }
+.nb-header--sentence { background: var(--badge-pattern-bg); color: var(--badge-pattern-text); }
 .nb-header--idiom { background: var(--badge-idiom-bg); color: var(--badge-idiom-text); }
 .nb-header--common_usage { background: var(--badge-usage-bg); color: var(--badge-usage-text); }
 .nb-header--uncategorized { background: var(--border); color: var(--text-secondary); }

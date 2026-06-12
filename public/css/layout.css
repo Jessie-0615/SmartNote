@@ -138,7 +138,7 @@ body::after {
 }
 .badge--word { background: var(--badge-word-bg); color: var(--badge-word-text); }
 .badge--phrase { background: var(--badge-phrase-bg); color: var(--badge-phrase-text); }
-.badge--sentence_pattern { background: var(--badge-pattern-bg); color: var(--badge-pattern-text); }
+.badge--sentence { background: var(--badge-pattern-bg); color: var(--badge-pattern-text); }
 .badge--idiom { background: var(--badge-idiom-bg); color: var(--badge-idiom-text); }
 .badge--common_usage { background: var(--badge-usage-bg); color: var(--badge-usage-text); }
 

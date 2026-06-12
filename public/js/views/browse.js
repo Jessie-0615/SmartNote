@@ -11,7 +11,7 @@ function renderBrowse(container) {
         <button class="pill active" data-cat="all">All</button>
         <button class="pill" data-cat="word">Word</button>
         <button class="pill" data-cat="phrase">Phrase</button>
-        <button class="pill" data-cat="sentence_pattern">Pattern</button>
+        <button class="pill" data-cat="sentence">Sentence</button>
         <button class="pill" data-cat="idiom">Idiom</button>
         <button class="pill" data-cat="common_usage">Usage</button>
         <button class="pill" data-cat="favorites">★ Favorites</button>
@@ -192,7 +192,7 @@ function renderBrowse(container) {
 
   function renderNotebook(notes,list,countEl) {
     const total=notes.length; countEl.textContent=`${total} note${total!==1?'s':''} · Notebook view`;
-    const categoryOrder=['word','phrase','sentence_pattern','idiom','common_usage'];
+    const categoryOrder=['word','phrase','sentence','idiom','common_usage'];
     const grouped={}; const uncategorized=[];
     for (const cat of categoryOrder) grouped[cat]=[];
     for (const n of notes) { if (n.category&&grouped[n.category]) grouped[n.category].push(n); else uncategorized.push(n); }

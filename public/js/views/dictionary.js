@@ -85,17 +85,29 @@ async function renderDictionary(container) {
     const resultDiv = document.getElementById('dictResult');
     resultDiv.innerHTML = '<div class="empty-state"><div class="spinner spinner--lg"></div><p style="margin-top:var(--space-md)">Looking up...</p></div>';
 
+    // Detect long sentences/passages — use translation-only mode
+    const wordCount = query.trim().split(/\s+/).length;
+    const isPassage = wordCount >= 5 || /[.!?]/.test(query);
+
     try {
+      const body = { word: query, direction };
+      if (isPassage) body.mode = 'translate';
+
       const res = await fetch('/api/dictionary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: query, direction }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Lookup failed');
       }
       const data = await res.json();
+
+      if (data.mode === 'translate') {
+        renderTranslation(data);
+        return;
+      }
 
       // Fetch phonetic text (not audio — we use real voice for that)
       let phonetic = data.phonetic || '';
@@ -210,6 +222,49 @@ async function renderDictionary(container) {
         document.getElementById('dictSearch').value = word;
         doSearch(word);
       });
+    });
+  }
+
+  function renderTranslation(data) {
+    const resultDiv = document.getElementById('dictResult');
+    const isEn = direction === 'en-zh';
+    const escapedWord = escapeHtml(data.word);
+    const escapedTranslation = escapeHtml(data.translation || '');
+
+    resultDiv.innerHTML = `
+      <div class="card" style="border-left:4px solid var(--primary)">
+        <div class="flex-between mb-md" style="flex-wrap:wrap;gap:var(--space-sm)">
+          <div style="font-weight:600;font-size:var(--font-size-sm);color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em">${isEn ? '原文 · Source' : '原文 · Source'}</div>
+          <button class="btn btn--primary btn--sm" id="addToNotesBtn" style="font-size:var(--font-size-xs)">+ Add to Notes</button>
+        </div>
+        <div style="background:var(--bg);padding:var(--space-md);border-radius:var(--radius-sm);margin-bottom:var(--space-md);line-height:1.7;font-size:var(--font-size-md)">
+          ${escapedWord}
+        </div>
+        <div style="font-weight:600;font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-xs);text-transform:uppercase;letter-spacing:0.05em">${isEn ? '中文翻译 · Translation' : 'English Translation'}</div>
+        <div style="background:var(--primary-bg);padding:var(--space-md);border-radius:var(--radius-sm);line-height:1.7;font-size:var(--font-size-lg);font-weight:600">
+          ${escapedTranslation}
+        </div>
+      </div>
+    `;
+
+    // Wire up Add to Notes button
+    document.getElementById('addToNotesBtn')?.addEventListener('click', async () => {
+      const note = createNoteWithSM2({
+        id: uuid(),
+        content: data.word,
+        userMemo: isEn ? `中文: ${data.translation}` : `English: ${data.translation}`,
+        category: null,
+        aiExpanded: false,
+      });
+      try {
+        const category = await aiCategorize(note.content);
+        note.category = category;
+        note.aiCategorizedAt = Date.now();
+      } catch (_) { /* will be uncategorized */ }
+      await saveNote(note);
+      showToast('Translation added to notes!', 'success');
+      const btn = document.getElementById('addToNotesBtn');
+      if (btn) { btn.textContent = '✓ Added'; btn.disabled = true; }
     });
   }
 }

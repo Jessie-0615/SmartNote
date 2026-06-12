@@ -126,7 +126,7 @@ function debounce(fn, delay = 300) {
 const CATEGORIES = {
   word: { label: 'Word', icon: 'W', color: '#1565c0' },
   phrase: { label: 'Phrase', icon: 'P', color: '#c62828' },
-  sentence_pattern: { label: 'Sentence Pattern', icon: 'S', color: '#7b1fa2' },
+  sentence: { label: 'Sentence', icon: 'S', color: '#7b1fa2' },
   idiom: { label: 'Idiom', icon: 'I', color: '#e65100' },
   common_usage: { label: 'Common Usage', icon: 'C', color: '#2e7d32' },
 };

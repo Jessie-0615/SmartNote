@@ -219,6 +219,10 @@ async function renderNoteDetail(noteId) {
     `;
   }
 
+  // Detect if content is a long sentence (not suitable for word-level AI expansion)
+  const wordCount = (note.content || '').trim().split(/\s+/).length;
+  const isLongSentence = wordCount >= 5 || /[.!?]/.test(note.content || '');
+
   container.innerHTML = `
     <button class="btn btn--ghost mb-md" onclick="location.hash='#/browse'">← Back to Browse</button>
 
@@ -248,7 +252,13 @@ async function renderNoteDetail(noteId) {
       <div id="inlineEditArea" style="display:none"></div>
     </div>
 
-    ${!note.aiExpanded ? `
+    ${!note.aiExpanded ? (isLongSentence ? `
+      <div class="card mt-md" style="border-left:4px solid var(--text-tertiary);background:var(--bg)">
+        <p style="font-size:var(--font-size-sm);color:var(--text-secondary);line-height:1.6">
+          💡 This is a long sentence or passage. AI expansion (definitions, examples, etymology) is only available for individual words and short phrases. You can still use the dictionary to translate sentences.
+        </p>
+      </div>
+    ` : `
       <div class="card mt-md text-center">
         <p class="text-secondary mb-md">获取中文释义、双语例句、词源和相关表达</p>
         <button class="btn btn--primary" id="expandBtn">
@@ -258,7 +268,7 @@ async function renderNoteDetail(noteId) {
           AI将生成中文翻译、双语释义和例句，帮助理解和记忆。
         </p>
       </div>
-    ` : ''}
+    `) : ''}
 
     ${expansionHtml}
 
@@ -286,8 +296,8 @@ async function renderNoteDetail(noteId) {
   if (editBtn) {
     editBtn.addEventListener('click', () => {
       const area = document.getElementById('inlineEditArea');
-      const categories = ['word','phrase','sentence_pattern','idiom','common_usage'];
-      const catLabels = { word:'Word', phrase:'Phrase', sentence_pattern:'Sentence Pattern', idiom:'Idiom', common_usage:'Common Usage' };
+      const categories = ['word','phrase','sentence','idiom','common_usage'];
+      const catLabels = { word:'Word', phrase:'Phrase', sentence:'Sentence', idiom:'Idiom', common_usage:'Common Usage' };
       area.innerHTML = `
         <div class="card mt-md" style="border:2px solid var(--primary)">
           <div class="form-group">

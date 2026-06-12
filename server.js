@@ -199,13 +199,30 @@ function callDeepSeek(messages, apiKey, temperature = 0.3) {
 // /api/dictionary — bilingual lookup
 // ---------------------------------------------------------------------------
 async function handleDictionary(req, res, apiKey) {
-  const { word, direction } = await readBody(req);
+  const { word, direction, mode } = await readBody(req);
   const dir = direction === 'zh-en' ? 'zh-en' : 'en-zh';
   const isEnToZh = dir === 'en-zh';
 
   if (!word || typeof word !== 'string' || word.trim().length < 1) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Missing or empty "word" field' }));
+    return;
+  }
+
+  // Translation mode — for long sentences/passages, just return the translation
+  if (mode === 'translate') {
+    const translatePrompt = isEnToZh
+      ? `You are a translator. Translate the following English text into natural, fluent simplified Chinese (简体中文). Return ONLY the Chinese translation — no explanations, no notes, no JSON. Just the translated text.`
+      : `You are a translator. Translate the following Chinese text into natural, fluent English. Return ONLY the English translation — no explanations, no notes, no JSON. Just the translated text.`;
+
+    const raw = await callDeepSeek([
+      { role: 'system', content: translatePrompt },
+      { role: 'user', content: word.trim() },
+    ], apiKey, 0.3);
+
+    const translation = raw.trim();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ word: word.trim(), translation, direction: dir, mode: 'translate' }));
     return;
   }
 
@@ -256,11 +273,11 @@ async function handleCategorize(req, res, apiKey) {
 
 - word: A single vocabulary word (e.g., "serendipity", "run", "beautiful")
 - phrase: A short group of words (2-5) that commonly go together (e.g., "in the meantime", "take off")
-- sentence_pattern: A structural sentence template or grammar pattern (e.g., "If I were you, I would...", "It is + adjective + to + verb")
+- sentence: A structural sentence template or grammar pattern (e.g., "If I were you, I would...", "It is + adjective + to + verb")
 - idiom: A figurative expression where the meaning is different from the literal words (e.g., "break the ice", "spill the beans")
 - common_usage: A commonly used expression, fixed phrase, or everyday conversational pattern (e.g., "How's it going?", "Long time no see")
 
-Reply with ONLY the category name in lowercase (one of: word, phrase, sentence_pattern, idiom, common_usage). No explanation, no punctuation, no other text.`;
+Reply with ONLY the category name in lowercase (one of: word, phrase, sentence, idiom, common_usage). No explanation, no punctuation, no other text.`;
 
   const raw = await callDeepSeek([
     { role: 'system', content: systemPrompt },
@@ -268,7 +285,7 @@ Reply with ONLY the category name in lowercase (one of: word, phrase, sentence_p
   ], apiKey);
 
   const category = raw.trim().toLowerCase();
-  const valid = ['word', 'phrase', 'sentence_pattern', 'idiom', 'common_usage'];
+  const valid = ['word', 'phrase', 'sentence', 'idiom', 'common_usage'];
   const result = valid.includes(category) ? category : 'common_usage';
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -308,7 +325,7 @@ Return a JSON object (ONLY valid JSON, no markdown, no code fences) with exactly
 Guidelines by category:
 - word: Focus on Chinese definition, synonyms (with Chinese translations), word family
 - phrase: Explain when and how to use the phrase (in Chinese), with Chinese-translated examples
-- sentence_pattern: Explain the pattern structure in Chinese, when to use it, give bilingual examples
+- sentence: Explain the pattern structure in Chinese, when to use it, give bilingual examples
 - idiom: Include both literal and figurative meaning, with Chinese explanations
 - common_usage: Explain the social context in Chinese, typical situations where this is used
 
