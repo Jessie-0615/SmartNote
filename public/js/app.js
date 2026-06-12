@@ -87,10 +87,8 @@ async function seedDemoIfEmpty() {
   const now = Date.now();
   const day = 86400000;
 
-  // Staggered review dates so some are due now, some later
+  // All demo notes are immediately due so the review page has content
   const dueNow = now;
-  const dueLater = now + 3 * day;
-  const dueMuchLater = now + 14 * day;
 
   const demoNotes = [
     // ── Word ──
@@ -111,7 +109,7 @@ async function seedDemoIfEmpty() {
         { en: 'chance encounter', zh: '偶然相遇' },
         { en: 'happy accident', zh: '美好的意外' }
       ],
-      nextReviewAt: dueLater, consecutiveCorrect: 2, interval: 7, repetitions: 3,
+      nextReviewAt: dueNow, consecutiveCorrect: 2, interval: 7, repetitions: 3,
       favorited: true
     },
     {
@@ -137,7 +135,7 @@ async function seedDemoIfEmpty() {
         { en: 'bounce back', zh: '反弹，恢复' },
         { en: 'adaptable', zh: '适应力强的' }
       ],
-      nextReviewAt: dueMuchLater, consecutiveCorrect: 5, interval: 30, repetitions: 6,
+      nextReviewAt: dueNow, consecutiveCorrect: 5, interval: 30, repetitions: 6,
       favorited: true
     },
 
@@ -151,7 +149,7 @@ async function seedDemoIfEmpty() {
     {
       id: 'demo-5', content: 'in the long run', category: 'phrase',
       userMemo: '中文：从长远来看，终究',
-      nextReviewAt: dueLater, consecutiveCorrect: 1, interval: 3, repetitions: 2,
+      nextReviewAt: dueNow, consecutiveCorrect: 1, interval: 3, repetitions: 2,
       favorited: false
     },
 
@@ -165,7 +163,7 @@ async function seedDemoIfEmpty() {
     {
       id: 'demo-7', content: 'It depends on the weather whether we go or stay.', category: 'sentence',
       userMemo: '中文：去还是留，取决于天气。',
-      nextReviewAt: dueLater, consecutiveCorrect: 2, interval: 7, repetitions: 3,
+      nextReviewAt: dueNow, consecutiveCorrect: 2, interval: 7, repetitions: 3,
       favorited: false
     },
 
@@ -187,7 +185,7 @@ async function seedDemoIfEmpty() {
         { en: 'get the ball rolling', zh: '开始，带动起来' },
         { en: 'social lubricant', zh: '社交润滑剂' }
       ],
-      nextReviewAt: dueLater, consecutiveCorrect: 3, interval: 7, repetitions: 4,
+      nextReviewAt: dueNow, consecutiveCorrect: 3, interval: 7, repetitions: 4,
       favorited: true
     },
     {
@@ -207,13 +205,13 @@ async function seedDemoIfEmpty() {
     {
       id: 'demo-11', content: 'Not too shabby', category: 'common_usage',
       userMemo: '中文：还不错，挺好的（带有惊喜的语气）',
-      nextReviewAt: dueLater, consecutiveCorrect: 2, interval: 7, repetitions: 3,
+      nextReviewAt: dueNow, consecutiveCorrect: 2, interval: 7, repetitions: 3,
       favorited: false
     },
     {
       id: 'demo-12', content: 'Long time no see', category: 'common_usage',
       userMemo: '中文：好久不见（据说源自中文"好久不见"的直译，在英语中已广泛使用）',
-      nextReviewAt: dueMuchLater, consecutiveCorrect: 3, interval: 14, repetitions: 4,
+      nextReviewAt: dueNow, consecutiveCorrect: 3, interval: 14, repetitions: 4,
       favorited: true
     }
   ];
